@@ -1,5 +1,7 @@
 
 public class Vector2D {
+	public static final float DELTA = (float) 1e-10;
+	
 	public float x;
 	public float y;
 	
@@ -9,50 +11,74 @@ public class Vector2D {
 		this.y = y;
 	}
 	
+	public Vector2D(Vector2D vector)
+	{
+		this.x = vector.x;
+		this.y = vector.y;
+	}
+	
 	public void setValue(float x, float y)
 	{
 		this.x = x;
 		this.y = y;
 	}
 	
-	public void add(float scalar)
+	public float magnitude()
 	{
-		this.x += scalar;
-		this.y += scalar;
+		return (float) Math.sqrt(x * x + y * y);
 	}
 	
-	public void add(float x, float y)
+	public Vector2D add(float scalar)
 	{
-		this.x += x;
-		this.y += y;
+		return new Vector2D(x + scalar, y + scalar);
 	}
 	
-	public void add(Vector2D vector)
+	public Vector2D add(float x, float y)
 	{
-		this.x += vector.x;
-		this.y += vector.y;
+		return new Vector2D(this.x + x, this.y + y);
 	}
 	
-	public void mult(float scalar)
+	public Vector2D add(Vector2D vector)
 	{
-		this.x *= scalar;
-		this.y *= scalar;
+		return new Vector2D(this.x + vector.x, this.y + vector.y);
 	}
 	
-	public void mult(float x, float y)
+	public Vector2D mult(float scalar)
 	{
-		this.x *= x;
-		this.y *= y;
+		return new Vector2D(this.x * scalar, this.y * scalar);
 	}
 	
-	public void mult(Vector2D vector)
+	public Vector2D mult(float x, float y)
 	{
-		this.x *= vector.x;
-		this.y *= vector.y;
+		return new Vector2D(this.x * x, this.y * y);
+	}
+	
+	public Vector2D mult(Vector2D vector)
+	{
+		return new Vector2D(this.x * vector.x, this.y * vector.y);
 	}
 	
 	public float dot(Vector2D v)
 	{
 		return x * v.x + y * v.y;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj.getClass() == this.getClass())
+		{
+			Vector2D v = (Vector2D) obj;
+			if (Math.abs(x - v.x) < DELTA && Math.abs(y - v.y) < DELTA)
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public Vector2D norm()
+	{
+		float m = magnitude();
+		return new Vector2D(x / m, y / m);
 	}
 }

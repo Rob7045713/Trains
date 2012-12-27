@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class CanvasHolder extends Canvas
 {
-    private ArrayList<Rectangle> rects;
+    private ArrayList<Rectangle2> rects;
     private ArrayList<ColoredPolygon> polys;
     private JFrame frame;
     int myWidth;
@@ -14,7 +14,7 @@ public class CanvasHolder extends Canvas
     public CanvasHolder (int width, int height)
     {
 	super ();
-	rects  = new ArrayList<Rectangle> ();
+	rects  = new ArrayList<Rectangle2> ();
 	polys = new ArrayList<ColoredPolygon> ();
 	frame = new JFrame("window");
 	frame.setSize(width,height);
@@ -31,7 +31,7 @@ public class CanvasHolder extends Canvas
 	frame.addKeyListener (listener);
     }
 
-    public void add (Rectangle rect)
+    public void add (Rectangle2 rect)
     {
 	int [] x = {rect.getX(), rect.getX()+rect.getWidth(), rect.getX()+rect.getWidth(), rect.getX()};
 	int [] y = {rect.getY(), rect.getY(), rect.getY()+rect.getHeight(), rect.getY()+rect.getHeight()};

@@ -1,11 +1,11 @@
 import java.awt.Color;
 
-public class Rectangle
+public class Rectangle2
 {
     private int myX, myY, myWidth, myHeight;
     private Color myColor;
 
-    public Rectangle (int x, int y, int width, int height, Color color)
+    public Rectangle2 (int x, int y, int width, int height, Color color)
     {
 	myX = x;
 	myY = y;

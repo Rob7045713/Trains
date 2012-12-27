@@ -380,11 +380,11 @@ public class Trains
     		{
     			Direction heading = headings.next();
     			double length = lengths.next ().doubleValue ();
-    			Rectangle rectangle = new Rectangle(0,0,0,0, color);
+    			Rectangle2 rectangle = new Rectangle2(0,0,0,0, color);
     			switch (heading)
     			{
     			case UP:
-    				rectangle = new Rectangle
+    				rectangle = new Rectangle2
     				((int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
     						(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
     						(int)((Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
@@ -393,7 +393,7 @@ public class Trains
     				y+=length;
     				break;
     			case RIGHT:
-    				rectangle = new Rectangle
+    				rectangle = new Rectangle2
     				((int)((x-length-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
     						(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
     						(int)((length+Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
@@ -402,7 +402,7 @@ public class Trains
     				x-=length;
     				break;
     			case DOWN:
-    				rectangle = new Rectangle
+    				rectangle = new Rectangle2
     				((int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
     						(int)((y-length-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
     						(int)((Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
@@ -411,7 +411,7 @@ public class Trains
     				y-=length;
     				break;
     			case LEFT:
-    				rectangle = new Rectangle
+    				rectangle = new Rectangle2
     				((int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
     						(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
     						(int)((length+Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
