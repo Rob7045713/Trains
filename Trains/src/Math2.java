@@ -19,4 +19,9 @@ public class Math2 {
 	{
 		return a / Math.abs(a);
 	}
+	
+	public static float dot(Vector2D a, Vector2D b)
+	{
+		return a.x * b.x + a.y * b.y;
+	}
 }
