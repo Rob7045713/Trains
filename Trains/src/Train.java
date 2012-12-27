@@ -20,6 +20,7 @@ public class Train
     private float tailSpeed;
     private float headAcceleration;
     private float tailAcceleration;
+    private boolean isDead;
     
     private ArrayDeque<Direction> myHeadings;
     private ArrayDeque<Double> myLengths;
@@ -76,7 +77,7 @@ public class Train
     	headSpeed += headAcceleration * elapsed;
     	
     	// calculate change in position and update head position
-    	Vector2D deltaPos = (new Vector2D(direction)).mult(headSpeed * elapsed);
+    	Vector2D deltaPos = (direction).mult(headSpeed * elapsed);
     	headPosition = headPosition.add(deltaPos);
     	
     	// check if direction has changed => push new segment
@@ -86,7 +87,7 @@ public class Train
     	}
     	
     	// update the first segment
-    	Vector2D newVec = segments.removeFirst().add(deltaPos);
+    	Vector2D newVec = segments.removeFirst().add(deltaPos.mult(-1.0f));
     	segments.addFirst(newVec);
     	
     	// calculate new tail speed
@@ -109,20 +110,23 @@ public class Train
     			// was the last segment
     			if (segments.isEmpty())
     			{
-    				// TODO player lost
+    				isDead = true;
+    				break;
     			}
     		}
     		else	// segment is longer => shrink
     		{
     			float newLength = segment.magnitude() - deltaLength;
     			segments.addLast(segment.norm().mult(newLength));
+    			
+    			deltaLength = 0;
     		}
     	}
     }
     
     private void updateAccelerations()
     {
-    	
+    	// TODO this
     }
     
     public int checkCollisions(Rectangle r)
@@ -134,9 +138,34 @@ public class Train
     {
     	int numCollisions = 0;
     	
-    	// TODO this
+    	ArrayList<Rectangle> rectangles = getRectangles();
+    	
+    	while (begin > 0)
+    	{
+    		rectangles.remove(0);
+    		begin--;
+    	}
+    	
+    	for (Rectangle rect : rectangles)
+    	{
+    		if (r.intersects(rect))
+    			numCollisions++;
+    	}
     	
     	return numCollisions;
+    }
+    
+    public int checkCollisions(Train train)
+    {
+    	Rectangle r = train.getRectangles().get(0);
+    	int begin = 0;
+    	
+    	if (train == this)
+    	{
+    		begin = 2;
+    	}
+    	
+    	return checkCollisions(r, begin);
     }
     
     public ArrayList<Rectangle> getRectangles()
@@ -146,8 +175,20 @@ public class Train
     	
     	for (Vector2D segment : segments)
     	{
-    		// TODO this
-    		Rectangle r = new Rectangle();
+    		Vector2D shortVec = (new Vector2D(segment.norm().y, segment.norm().x)).mult((float) COLLISION_WIDTH);
+    		float width = Math.max(Math.abs(segment.x), Math.abs(shortVec.x));
+    		float height = Math.max(Math.abs(segment.y), Math.abs(shortVec.y));
+    		
+    		Vector2D offset = new Vector2D(Math.min(segment.x, 0), Math.min(segment.y, 0));
+    		offset = offset.add(
+    				new Vector2D(Math.abs(segment.norm().y), Math.abs(segment.norm().x)).mult((float)COLLISION_WIDTH / 2.0f));
+    		Vector2D topLeft = pos.add(offset);
+    		
+    		// TODO reconsider this
+    		int ppu = Trains.PIXELS_PER_UNIT;
+    		
+    		Rectangle r = new Rectangle((int) (ppu * topLeft.x), (int) (ppu * topLeft.y),
+    				(int) (ppu * width), (int) (ppu * height));
     	}
     	
     	return rectangles;

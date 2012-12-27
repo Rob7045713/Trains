@@ -14,7 +14,7 @@ import java.lang.Math;
 public class Trains
 {
     private static final int WIDTH = 1020;
-    private static final int PIXELS_PER_UNIT = WIDTH;
+    public static final int PIXELS_PER_UNIT = WIDTH;
     private static final int HEIGHT = 720;
     private static final int WALL_WIDTH = WIDTH/500;
     private static final long MAX_FRAMERATE = 60;
