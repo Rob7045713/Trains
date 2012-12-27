@@ -5,7 +5,7 @@ import java.lang.Double;
 
 public class Train
 {
-	public static final double BASE_SPEED = .0005;
+	public static final double BASE_SPEED = .0025;
     public static final double ACCELERATION = .00001;
     public static final double COLLISION_WIDTH = .002;
     public static final double ACCELERATION_WIDTH = .04;
@@ -81,6 +81,8 @@ public class Train
    {
 	   myHeadings.clear();
 	   myHeadings.addFirst(heading);
+	   myEngineSpeed = BASE_SPEED;
+	   myKabooseSpeed = BASE_SPEED;
    }
     
     public void setHeading(Direction heading)

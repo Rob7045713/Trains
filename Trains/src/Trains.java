@@ -3,6 +3,7 @@ import java.awt.event.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.lang.Math;
 
 /**
  * Game main class.
@@ -24,6 +25,7 @@ public class Trains
     private InputManager inputManager;
     private ConcreteKeyListener listener;
     private boolean isOver;
+    private boolean isQuit;
     
     /**
      * Constructor for Trains. Initializes canvas, player list, and input management.
@@ -56,13 +58,16 @@ public class Trains
     	try {
     		
     		// bind player keys
-    		bindPlayerKeys(0, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D);
+    		bindPlayerKeys(0, KeyEvent.VK_COMMA, KeyEvent.VK_O, KeyEvent.VK_A, KeyEvent.VK_E);
     		bindPlayerKeys(1, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT);
 			
     		// bind general keys
 			Method setOver = Trains.class.getMethod("setOver", Boolean.class);
 			Object[] trueObj = {new Boolean(true)};
 			inputManager.register(KeyEvent.VK_ESCAPE, new Action(this, setOver, trueObj));
+			
+			Method reset = Trains.class.getMethod("reset");
+			inputManager.register(KeyEvent.VK_ENTER, new Action(this, reset, new Object [0]));
 			
 		} catch (NoSuchMethodException e) {
 			System.err.println("Error: Key binding failure");
@@ -113,7 +118,12 @@ public class Trains
      */
     public void setOver(Boolean over)
     {
-    	this.isOver = over;
+    	this.isQuit = over;
+    }
+
+    public void reset ()
+    {
+	init ();
     }
     
     /**
@@ -145,7 +155,8 @@ public class Trains
     private void update(long elapsed) 
     {
     	inputManager.executeInput();
-    	updatePhysics(elapsed);
+	if (!isOver)
+	    updatePhysics(elapsed);
     }
     
     /**
@@ -220,26 +231,25 @@ public class Trains
 	
     	//System.out.println ("Press esc to exit...");
 	
-    	while (!isOver)
+    	while (!isQuit)
     	{
-    		// calculate elapsed time
-    		oldTime = currentTime;
-    		currentTime = System.currentTimeMillis();
-    		long elapsed = currentTime - oldTime;
-    		
+    		// update / draw
+	    long elapsed = 0;
+		oldTime = System.currentTimeMillis();
+    		update(elapsed);
+    		draw();
+		elapsed = System.currentTimeMillis()-oldTime;
+
     		// framerate limiter
     		long frameTime = 1000 / MAX_FRAMERATE;
     		if (elapsed < frameTime)
     		{
-    			try{Thread.sleep (frameTime - elapsed);}catch (InterruptedException ie) {System.out.println ("Interrupted!!!");}
+		    try{Thread.sleep (Math.max (frameTime,elapsed));}catch (InterruptedException ie) {System.out.println ("Interrupted!!!");}
     		
     			currentTime = System.currentTimeMillis();
     			elapsed = currentTime - oldTime;
     		}
     		
-    		// update / draw
-    		update(elapsed);
-    		draw();
     	}
 	
     	//System.out.println ("done.");
