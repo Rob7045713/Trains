@@ -17,6 +17,11 @@ public class Vector2D {
 		this.y = vector.y;
 	}
 	
+	public Vector2D copy()
+	{
+		return new Vector2D(this);
+	}
+	
 	public void setValue(float x, float y)
 	{
 		this.x = x;

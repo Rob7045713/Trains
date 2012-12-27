@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.event.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class Trains
     private ConcreteKeyListener listener;
     private boolean isOver;
     private boolean isQuit;
+    private static Rectangle BOUNDARY = new Rectangle(0, 0, WIDTH, HEIGHT);
     
     /**
      * Constructor for Trains. Initializes canvas, player list, and input management.
@@ -101,11 +103,11 @@ public class Trains
     private void bindPlayerKeys(int player, int up, int down, int left, int right)
     {
     	try {
-			Method setHeading = Train.class.getMethod("setHeading", Direction.class);
-			Object[] upObj = {Direction.UP};
-			Object[] rightObj = {Direction.RIGHT};
-			Object[] downObj = {Direction.DOWN};
-			Object[] leftObj = {Direction.LEFT};
+			Method setHeading = Train.class.getMethod("setDirection", Vector2D.class);
+			Object[] upObj = {VectorDirection.UP};
+			Object[] rightObj = {VectorDirection.RIGHT};
+			Object[] downObj = {VectorDirection.DOWN};
+			Object[] leftObj = {VectorDirection.LEFT};
 			
 			inputManager.register(up, new Action(players.get(player), setHeading, upObj));
 			inputManager.register(left, new Action(players.get(player), setHeading, leftObj));
@@ -133,7 +135,7 @@ public class Trains
 
     public void reset ()
     {
-	init ();
+    	init ();
     }
     
     /**
@@ -141,18 +143,20 @@ public class Trains
      */
     private void init()
     {
-    	double[] playerInitialXs = {.8, .8};
-    	double[] playerInitialYs = {.4/PIXELS_PER_UNIT*HEIGHT, .6/PIXELS_PER_UNIT*HEIGHT};
-    	Direction[] playerInitialHeadings = {Direction.RIGHT, Direction.RIGHT};
-    	double[] playerInitialLengths = {.7, .7};
+    	Vector2D[] positions = {
+    			new Vector2D(.8f, (float) (.4 / PIXELS_PER_UNIT * HEIGHT)),
+    			new Vector2D(.8f, (float) (.6 / PIXELS_PER_UNIT * HEIGHT)) };
+    	Vector2D[] directions = {
+    			VectorDirection.RIGHT,
+    			VectorDirection.RIGHT };
+    	float[] lengths = {
+    			.7f, 
+    			.7f };
     	
     	for (int i = 0; i < NUM_PLAYERS; i++)
     	{
-    		players.get(i).setX(playerInitialXs[i]);
-        	players.get(i).setY(playerInitialYs[i]);
-        	players.get(i).initHeading(playerInitialHeadings[i]);
-        	players.get(i).setLength(playerInitialLengths[i]);
-    	}
+    		players.get(i).init(positions[i], directions[i], lengths[i]);
+     	}
     	
     	isOver = false;
     }
@@ -180,43 +184,21 @@ public class Trains
     	// TODO update these to be based on time
     	for (Train player : players)
     	{
-    		player.step();
+    		player.update(elapsed, this);
     	}
     	
-		if (players.get(0).crashedInto(players.get(1)))
+    	// TODO pretty this up
+		if (players.get(0).isDead())
 	    {
 			isOver = true;
-			System.out.println ("Player 2 wins");
+			System.out.println("Player 2 wins");
 	    }
-		if (players.get(1).crashedInto(players.get(0)))
-	    {
+		if (players.get(1).isDead())
+		{
 			isOver = true;
-			System.out.println ("Player 1 wins");
-	    }
-		if (players.get(0).crashedInto(players.get(0)))
-	    {
-			isOver = true;
-			System.out.println ("Player 2 wins");
-	    }
-		if (players.get(1).crashedInto(players.get(1)))
-	    {
-			isOver = true;
-			System.out.println ("Player 1 wins");
-	    }
-		if (OutOfBounds (players.get(0)))
-	    {
-			isOver = true;
-			System.out.println ("Player 2 wins");
-	    }
-		if (OutOfBounds (players.get(1)))
-	    {
-			isOver = true;
-			System.out.println ("Player 1 wins");
-	    }
+			System.out.println("Player 1 Wins");
+		}
 		
-		// TODO update these to be based on time
-		players.get(0).doAcceleration (players.get(1));
-		players.get(1).doAcceleration (players.get(0));
     }
     
     /**
@@ -266,18 +248,14 @@ public class Trains
     }
 
     /**
-     * Check if a <code>Train</code> has gone out of bounds of the playing field.
+     * Check if a <code>Rectangle</code> is contained by the bounds of the playing field
      * 
-     * @param train <code>Train</code> to check out-of-bounds-ness for
-     * @return <code>true</code> if the train has gone out of bounds
+     * @param rect <code>Rectangle</code> to check bounds for
+     * @return <code>true</code> if the rectangle is in bounds
      */
-    static boolean OutOfBounds (Train train)
+    public boolean inBounds (Rectangle rect)
     {
-    	// TODO refactor to use rectangle intersect
-    	return (train.getX() < 0 
-    			|| train.getX()*PIXELS_PER_UNIT > WIDTH
-    			|| train.getY() < 0
-    			|| train.getY()*PIXELS_PER_UNIT > HEIGHT);
+    	return BOUNDARY.contains(rect);
     }
 
     /**
@@ -289,150 +267,15 @@ public class Trains
     public void ShowTrain (Train train, Color color)
     {
     	// TODO clean this
-    	Iterator<Direction> headings = train.getHeadingsIterator();
-    	Iterator<Double> lengths = train.getLengthsIterator();
-    	double x = train.getX ();
-    	double y = train.getY ();
-    	Direction engineHeading = train.getHeading();
-    	//Color color2 = new Color (color.getRed(),color.getGreen(),color.getBlue(),100);
-    	switch (engineHeading)
+    	ArrayList<Rectangle> rects = train.getRectangles();
+    	for (Rectangle r : rects)
     	{
-    		case UP:
-    			int [] xPoints0 = {(int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x-Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			int [] yPoints0 = {(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y+Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			canvasHolder.add (new ColoredPolygon (xPoints0,
-    					yPoints0,
-    					3,
-    					color));
-    			int [] xPoints0a = {(int)((x+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x+Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			int [] yPoints0a = {(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y+Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			canvasHolder.add (new ColoredPolygon (xPoints0a,
-    					yPoints0a,
-    					3,
-    					color));
-    			break;
-    		case RIGHT:
-    			int [] xPoints1 = {(int)((x+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x-Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			int [] yPoints1 = {(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y-Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			canvasHolder.add (new ColoredPolygon (xPoints1,
-    					yPoints1,
-    					3,
-    					color));
-    			int [] xPoints1a = {(int)((x+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x-Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			int [] yPoints1a = {(int)((y+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y+Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			canvasHolder.add (new ColoredPolygon (xPoints1a,
-    					yPoints1a,
-    					3,
-    					color));
-    			break;
-    		case DOWN:
-    			int [] xPoints2 = {(int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x-Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			int [] yPoints2 = {(int)((y+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y-Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			canvasHolder.add (new ColoredPolygon (xPoints2,
-    					yPoints2,
-    					3,
-    					color));
-    			int [] xPoints2a = {(int)((x+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x+Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			int [] yPoints2a = {(int)((y+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y-Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			canvasHolder.add (new ColoredPolygon (xPoints2a,
-    					yPoints2a,
-    					3,
-    					color));
-    			break;
-    		case LEFT:
-    			int [] xPoints3 = {(int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x+Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			int [] yPoints3 = {(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y-Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			canvasHolder.add (new ColoredPolygon (xPoints3,
-    					yPoints3,
-    					3,
-    					color));
-    			int [] xPoints3a = {(int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((x+Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			int [] yPoints3a = {(int)((y+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y+Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    					(int)((y+Train.ACCELERATION_WIDTH/2)*PIXELS_PER_UNIT)};
-    			canvasHolder.add (new ColoredPolygon (xPoints3a,
-    					yPoints3a,
-    					3,
-    					color));
-	    	}
-	
-    		while(headings.hasNext ())
-    		{
-    			Direction heading = headings.next();
-    			double length = lengths.next ().doubleValue ();
-    			Rectangle2 rectangle = new Rectangle2(0,0,0,0, color);
-    			switch (heading)
-    			{
-    			case UP:
-    				rectangle = new Rectangle2
-    				((int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    						(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    						(int)((Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
-    						(int)((length+Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
-    						color);
-    				y+=length;
-    				break;
-    			case RIGHT:
-    				rectangle = new Rectangle2
-    				((int)((x-length-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    						(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    						(int)((length+Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
-    						(int)((Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
-    						color);
-    				x-=length;
-    				break;
-    			case DOWN:
-    				rectangle = new Rectangle2
-    				((int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    						(int)((y-length-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    						(int)((Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
-    						(int)((length+Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
-    						color);
-    				y-=length;
-    				break;
-    			case LEFT:
-    				rectangle = new Rectangle2
-    				((int)((x-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    						(int)((y-Train.COLLISION_WIDTH/2)*PIXELS_PER_UNIT),
-    						(int)((length+Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
-    						(int)((Train.COLLISION_WIDTH)*PIXELS_PER_UNIT),
-    						color);
-    				x+=length;
-    				break;
-    			}
-		
-    			canvasHolder.add(rectangle);
-    		}
+    		canvasHolder.add(r, color);
+    	}
+    	
+    	color = new Color(color.getRed(), color.getBlue(), color.getGreen(), 64);
+    	canvasHolder.add(train.getEndBox(Train.End.HEAD), color);
+    	canvasHolder.add(train.getEndBox(Train.End.TAIL), color);
     }
 
     /**
