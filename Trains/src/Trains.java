@@ -49,6 +49,16 @@ public class Trains
     	initKeyBindings();
     	
     }
+ 
+    /**
+     * Get a list of players in the game.
+     * 
+     * @return A list of players in the game
+     */
+    public ArrayList<Train> getPlayers()
+    {
+    	return players;
+    }
     
     /**
      * Initialize all key bindings for the game.
@@ -155,8 +165,8 @@ public class Trains
     private void update(long elapsed) 
     {
     	inputManager.executeInput();
-	if (!isOver)
-	    updatePhysics(elapsed);
+    	if (!isOver)
+    		updatePhysics(elapsed);
     }
     
     /**
@@ -164,7 +174,7 @@ public class Trains
      * 
      * @param elspased Time elapsed (in milliseconds) since the last update
      */
-    private void updatePhysics(long elspased)
+    private void updatePhysics(long elapsed)
     {
     	// TODO clean this
     	// TODO update these to be based on time

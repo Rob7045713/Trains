@@ -8,7 +8,8 @@ import java.lang.Double;
 public class Train
 {
 	public static final double BASE_SPEED = .0025;
-	public static final float MIN_SPEED = .0025f;
+	public static final float MIN_SPEED = .0025f * 60;
+	public static final float ACCEL = .00001f * 60;
     public static final double ACCELERATION = .00001;
     public static final double COLLISION_WIDTH = .002;
     public static final double ACCELERATION_WIDTH = .04;
@@ -22,6 +23,7 @@ public class Train
     private float tailAcceleration;
     private boolean isDead;
     
+    // TODO remove this section
     private ArrayDeque<Direction> myHeadings;
     private ArrayDeque<Double> myLengths;
 
@@ -30,6 +32,7 @@ public class Train
 
     private double myEngineSpeed;
     private double myKabooseSpeed;
+    // up to here
 
     public Train()
     {
@@ -56,6 +59,7 @@ public class Train
     	this.tailSpeed = MIN_SPEED;
     	this.headAcceleration = 0.0f;
     	this.tailAcceleration = 0.0f;
+    	this.isDead = false;
     	
     	Vector2D segment = new Vector2D(direction);
     	segment.mult(length);
@@ -64,17 +68,42 @@ public class Train
     	segments.add(segment);
     }
     
-    
-    public void update(long elapsed)
+    public void setDead(boolean isDead)
     {
-    	updateAccelerations();
+    	this.isDead = isDead;
+    }
+      
+    public boolean isDead()
+    {
+    	return isDead;
+    }
+ 
+    public Vector2D getPosition()
+    {
+    	return headPosition;
+    }
+    
+    public void update(long elapsed, Trains game)
+    {
+    	updateAccelerations(game);
     	updatePositions(elapsed);
+    	
+    	for (Train player : game.getPlayers())
+    	{
+    		if (checkCollisions(player) > 0)
+    		{
+    			isDead = true;
+    		}
+    	}
     }
     
     private void updatePositions(long elapsed)
     {
     	// calculate new speed
     	headSpeed += headAcceleration * elapsed;
+    
+    	if (headSpeed < MIN_SPEED)
+    		headSpeed = MIN_SPEED;
     	
     	// calculate change in position and update head position
     	Vector2D deltaPos = (direction).mult(headSpeed * elapsed);
@@ -92,6 +121,9 @@ public class Train
     	
     	// calculate new tail speed
     	tailSpeed += tailAcceleration * elapsed;
+    	
+    	if (tailSpeed < MIN_SPEED)
+    		tailSpeed = MIN_SPEED;
     	
     	// calculate distance to be covered by the tail
     	float deltaLength = tailSpeed * elapsed;
@@ -124,9 +156,52 @@ public class Train
     	}
     }
     
-    private void updateAccelerations()
+    private void updateAccelerations(Trains game)
     {
-    	// TODO this
+    	int accelCollisions = 0;
+    	
+    	int ppu = Trains.PIXELS_PER_UNIT;
+		int width = (int) (ACCELERATION_WIDTH * ppu);
+		int x = (int) (ppu * (headPosition.x - ACCELERATION_WIDTH / 2));
+		int y = (int) (ppu * (headPosition.y - ACCELERATION_WIDTH / 2));
+		Rectangle r = new Rectangle(x, y, width, width);
+    	
+    	for (Train player : game.getPlayers())
+    	{
+    		if (player != this)
+    			accelCollisions += player.checkCollisions(r);
+    	}
+    	
+    	if (accelCollisions > 0)
+    	{
+    		headAcceleration = (float) ACCEL;
+    	}
+    	else
+    	{
+    		headAcceleration = (float) (-1 * ACCEL);
+    	}
+    	
+    	Vector2D tailPosition = getTailPosition();
+    	x = (int) (ppu * (tailPosition.x - ACCELERATION_WIDTH / 2));
+		y = (int) (ppu * (tailPosition.y - ACCELERATION_WIDTH / 2));
+		r = new Rectangle(x, y, width, width);
+    	
+		accelCollisions = 0;
+		
+    	for (Train player : game.getPlayers())
+    	{
+    		if (player != this)
+    			accelCollisions += player.checkCollisions(r);
+    	}
+    	
+    	if (accelCollisions > 0)
+    	{
+    		tailAcceleration = (float) ACCEL;
+    	}
+    	else
+    	{
+    		tailAcceleration = (float) (-1 * ACCEL);
+    	}
     }
     
     public int checkCollisions(Rectangle r)
@@ -157,15 +232,17 @@ public class Train
     
     public int checkCollisions(Train train)
     {
-    	Rectangle r = train.getRectangles().get(0);
-    	int begin = 0;
+    	return checkCollisions(train, false);
+    }
+
+    public Vector2D getTailPosition()
+    {
+    	Vector2D tailPosition = headPosition;
     	
-    	if (train == this)
-    	{
-    		begin = 2;
-    	}
+    	for (Vector2D v : segments)
+    		tailPosition = tailPosition.add(v);
     	
-    	return checkCollisions(r, begin);
+    	return tailPosition;
     }
     
     public ArrayList<Rectangle> getRectangles()
@@ -175,25 +252,56 @@ public class Train
     	
     	for (Vector2D segment : segments)
     	{
-    		Vector2D shortVec = (new Vector2D(segment.norm().y, segment.norm().x)).mult((float) COLLISION_WIDTH);
-    		float width = Math.max(Math.abs(segment.x), Math.abs(shortVec.x));
-    		float height = Math.max(Math.abs(segment.y), Math.abs(shortVec.y));
+    		// find the dimensions of the rectangle
+    		float width = Math.abs(segment.x) + (float) COLLISION_WIDTH;
+    		float height = Math.abs(segment.y) + (float) COLLISION_WIDTH;
     		
-    		Vector2D offset = new Vector2D(Math.min(segment.x, 0), Math.min(segment.y, 0));
-    		offset = offset.add(
-    				new Vector2D(Math.abs(segment.norm().y), Math.abs(segment.norm().x)).mult((float)COLLISION_WIDTH / 2.0f));
-    		Vector2D topLeft = pos.add(offset);
+    		// find the top-left corner of the rectangle
+    		Vector2D bigOffset = new Vector2D(Math.min(segment.x, 0), Math.min(segment.y, 0));
+    		Vector2D smallOffset = (new Vector2D(1,1)).mult((float) COLLISION_WIDTH / 2.0f * -1.0f);
+    		Vector2D topLeft = pos.add(bigOffset).add(smallOffset);
     		
     		// TODO reconsider this
     		int ppu = Trains.PIXELS_PER_UNIT;
     		
     		Rectangle r = new Rectangle((int) (ppu * topLeft.x), (int) (ppu * topLeft.y),
     				(int) (ppu * width), (int) (ppu * height));
+    		
+    		rectangles.add(r);
     	}
     	
     	return rectangles;
     }
     
+    // TODO probably remove this
+    public int checkCollisions(Train train, boolean checkAcceleration)
+    {
+    	int begin = 0;
+    	
+    	if (train == this)
+    	{
+    		begin = 2;
+    		
+    		if (checkAcceleration)
+    		{
+    			return 0;
+    		}
+    	}
+    	
+    	Rectangle r = train.getRectangles().get(0);
+    	
+    	if (checkAcceleration)
+    	{
+    		int ppu = Trains.PIXELS_PER_UNIT;
+    		int width = (int) (ACCELERATION_WIDTH * ppu);
+    		int x = (int) (ppu * (headPosition.x - ACCELERATION_WIDTH / 2));
+    		int y = (int) (ppu * (headPosition.y - ACCELERATION_WIDTH / 2));
+    		r = new Rectangle(x, y, width, width);
+    	}
+    	
+    	return checkCollisions(r, begin);
+    }
+   
     public Direction getHeading ()
     {
     	return myHeadings.getFirst();
