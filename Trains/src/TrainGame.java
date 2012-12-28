@@ -1,10 +1,9 @@
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.lang.Math;
 
 /**
  * Game main class.
@@ -12,7 +11,7 @@ import java.lang.Math;
  * @author Austin Purves
  * @author Rob Argue
  */
-public class Trains
+public class TrainGame
 {
     private static final int WIDTH = 1020;
     public static final int PIXELS_PER_UNIT = WIDTH;
@@ -26,14 +25,14 @@ public class Trains
     private ArrayList<Train> players;
     private InputManager inputManager;
     private ConcreteKeyListener listener;
-    private boolean isOver;
     private boolean isQuit;
     private static Rectangle BOUNDARY = new Rectangle(0, 0, WIDTH, HEIGHT);
+    private GameState state; 
     
     /**
      * Constructor for Trains. Initializes canvas, player list, and input management.
      */
-    public Trains()
+    public TrainGame()
     {
     	// init canvas holder
     	canvasHolder = new CanvasHolder(WIDTH, HEIGHT);
@@ -50,6 +49,9 @@ public class Trains
     	canvasHolder.addKeyListener(listener);
     	inputManager = new InputManager(listener);
     	initKeyBindings();
+    	
+    	// init state
+    	state = new RunRoundState();
     	
     }
  
@@ -75,11 +77,11 @@ public class Trains
     		bindPlayerKeys(1, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT);
 			
     		// bind general keys
-			Method setOver = Trains.class.getMethod("setOver", Boolean.class);
+			Method setOver = TrainGame.class.getMethod("setOver", Boolean.class);
 			Object[] trueObj = {new Boolean(true)};
 			inputManager.register(KeyEvent.VK_ESCAPE, new Action(this, setOver, trueObj));
 			
-			Method reset = Trains.class.getMethod("reset");
+			Method reset = TrainGame.class.getMethod("init");
 			inputManager.register(KeyEvent.VK_ENTER, new Action(this, reset, new Object [0]));
 			
 		} catch (NoSuchMethodException e) {
@@ -133,11 +135,6 @@ public class Trains
     {
     	this.isQuit = over;
     }
-
-    public void reset ()
-    {
-    	init ();
-    }
     
     /**
      * Initialize the game to the beginning state.
@@ -159,7 +156,7 @@ public class Trains
     		players.get(i).init(positions[i], directions[i], lengths[i]);
      	}
     	
-    	isOver = false;
+    	state = new RunRoundState();
     }
     
     /**
@@ -169,37 +166,7 @@ public class Trains
      */
     private void update(long elapsed) 
     {
-    	inputManager.executeInput();
-    	if (!isOver)
-    		updatePhysics(elapsed);
-    }
-    
-    /**
-     * Update the game physics.
-     * 
-     * @param elspased Time elapsed (in milliseconds) since the last update
-     */
-    private void updatePhysics(long elapsed)
-    {
-    	// TODO clean this
-    	// TODO update these to be based on time
-    	for (Train player : players)
-    	{
-    		player.update(elapsed, this);
-    	}
-    	
-    	// TODO pretty this up
-		if (players.get(0).isDead())
-	    {
-			isOver = true;
-			System.out.println("Player 2 wins");
-	    }
-		if (players.get(1).isDead())
-		{
-			isOver = true;
-			System.out.println("Player 1 Wins");
-		}
-		
+    	state.update(this, elapsed);
     }
     
     /**
@@ -207,20 +174,22 @@ public class Trains
      */
     private void draw()
     {
-    	// TODO update this to push drawing to players
-    	canvasHolder.clear ();
-	//ShowTrain(players.get(0),Color.BLUE);
-	//	ShowTrain(players.get(1),Color.RED);
-	canvasHolder.paint2(this);
+    	canvasHolder.clear();
+    	canvasHolder.paint2(this);
+    }
+    
+    public void draw(Graphics g)
+    {
+    	state.draw(this, g);
     }
     
     /**
      * Run a round of the game.
      */
-    private void runRound()
+    private void run()
     {
     	long oldTime;
-	long elapsed = 0;
+    	long elapsed = 0;
       	long frameTime = 1000 / MAX_FRAMERATE;
 	
     	//System.out.println ("Press esc to exit...");
@@ -228,15 +197,22 @@ public class Trains
     	while (!isQuit)
     	{
     		// update / draw
-		oldTime = System.currentTimeMillis();
+    		oldTime = System.currentTimeMillis();
     		update(elapsed);
     		draw();
-		elapsed = System.currentTimeMillis()-oldTime;
+    		elapsed = System.currentTimeMillis()-oldTime;
 
     		// framerate limiter
     		if (elapsed < frameTime)
     		{
-		    try{Thread.sleep (frameTime - elapsed);}catch (InterruptedException ie) {System.out.println ("Interrupted!!!");}
+    			try
+    			{
+    				Thread.sleep (frameTime - elapsed);
+    			} 
+    			catch (InterruptedException ie)
+    			{
+    				System.out.println ("Interrupted!!!");
+    			}
     		
     			elapsed = System.currentTimeMillis() - oldTime;
     		}
@@ -259,34 +235,83 @@ public class Trains
     }
 
     /**
-     * Draw a <code>Train</code> to the screen.
-     * 
-     * @param train <code>Train</code> to draw
-     * @param color <code>Color</code> to draw the <code>Train</code>
-     */
-    public void ShowTrain (Train train, Color color)
-    {
-    	// TODO clean this
-    	ArrayList<Rectangle> rects = train.getRectangles();
-    	for (Rectangle r : rects)
-    	{
-    		canvasHolder.add(r, color);
-    	}
-    	
-    	//color = new Color(color.getRed(), color.getGreen(), color.getBlue(), 64);
-    	canvasHolder.add(train.getEndBox(Train.End.HEAD), color);
-    	//canvasHolder.add(train.getEndBox(Train.End.TAIL), color);
-    }
-
-    /**
      * Main method to run the game.
      * 
      * @param args
      */
     public static void main (String [] args)
     {
-    		Trains game = new Trains();
+    		TrainGame game = new TrainGame();
     		game.init();
-    		game.runRound ();
+    		game.run ();
+    }
+    
+    interface GameState
+    {
+    	public void update(TrainGame game, long elapsed);
+    	public void draw(TrainGame game, Graphics g);
+    }
+    
+    class RunRoundState implements GameState
+    {
+
+		@Override
+		public void update(TrainGame game, long elapsed) {
+			
+			// respond to input
+			inputManager.executeInput();
+			
+			// update players
+			for (Train player : players)
+	    	{
+	    		player.update(elapsed, game);
+	    	}
+	    	
+			// check if down to the last player
+	    	int playersAlive = 0;
+	    	for (Train player : players)
+	    	{
+	    		if (!player.isDead())
+	    			playersAlive++;
+	    	}
+	    	
+	    	if (playersAlive <= 1)
+	    		state = new GameOverState();
+		}
+
+		@Override
+		public void draw(TrainGame game, Graphics g) {
+			for (Train player : game.getPlayers())
+			{
+				player.draw(g);
+			}
+		}
+    	
+    }
+
+    class GameOverState implements GameState
+    {
+
+		@Override
+		public void update(TrainGame game, long elapsed) {
+			// respond to input
+			inputManager.executeInput();
+		}
+
+		@Override
+		public void draw(TrainGame game, Graphics g) {
+			Color winner = Color.WHITE;
+			
+			for (Train player : players)
+			{
+				if (!player.isDead())
+					winner = player.getColor();
+			}
+			
+			g.setColor(new Color(winner.getRed(), winner.getGreen(), winner.getBlue(), 16));
+			g.fillRect(BOUNDARY.x, BOUNDARY.y, BOUNDARY.width, BOUNDARY.height);
+			
+		}
+    	
     }
 }

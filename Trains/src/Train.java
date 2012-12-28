@@ -51,6 +51,11 @@ public class Train
     	segments = new ArrayDeque<Vector2D>();
     	segments.add(segment);
     }
+    
+    public Color getColor()
+    {
+    	return color;
+    }
        
     public void draw(Graphics g)
     {
@@ -117,7 +122,7 @@ public class Train
     	return headPosition;
     }
     
-    public void update(long elapsed, Trains game)
+    public void update(long elapsed, TrainGame game)
     {
     	updateAccelerations(game);
     	updatePositions(elapsed);
@@ -200,7 +205,7 @@ public class Train
     public Rectangle getEndBox(End end)
     {
     	Rectangle r;
-    	int ppu = Trains.PIXELS_PER_UNIT;
+    	int ppu = TrainGame.PIXELS_PER_UNIT;
 		int width = (int) (ACCELERATION_WIDTH * ppu);
 		int x = 0;
 		int y = 0;
@@ -220,7 +225,7 @@ public class Train
     	return new Rectangle(x, y, width, width);
     }
     
-    private void updateAccelerations(Trains game)
+    private void updateAccelerations(TrainGame game)
     {
     	int accelCollisions = 0;
     	
@@ -319,7 +324,7 @@ public class Train
     		Vector2D topLeft = pos.add(bigOffset).add(smallOffset);
     		
     		// TODO reconsider this
-    		int ppu = Trains.PIXELS_PER_UNIT;
+    		int ppu = TrainGame.PIXELS_PER_UNIT;
     		
     		Rectangle r = new Rectangle((int) (ppu * topLeft.x), (int) (ppu * topLeft.y),
     				(int) (ppu * width), (int) (ppu * height));
@@ -350,7 +355,7 @@ public class Train
     	
     	if (checkAcceleration)
     	{
-    		int ppu = Trains.PIXELS_PER_UNIT;
+    		int ppu = TrainGame.PIXELS_PER_UNIT;
     		int width = (int) (ACCELERATION_WIDTH * ppu);
     		int x = (int) (ppu * (headPosition.x - ACCELERATION_WIDTH / 2));
     		int y = (int) (ppu * (headPosition.y - ACCELERATION_WIDTH / 2));

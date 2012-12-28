@@ -56,19 +56,13 @@ public class CanvasHolder extends Canvas
 	this.getBufferStrategy().getDrawGraphics().setColor(color);
     }
 
-    public void paint2 (Trains game)
+    public void paint2 (TrainGame game)
     {	
 	Graphics g = this.getBufferStrategy ().getDrawGraphics ();
 	g.clearRect(0,0,myWidth,myHeight);
 	
-	for (Train player : game.getPlayers())
-	    {
-		player.draw(g);
-	    }
-	//for (Rectangle r : rects)
-	//{
-	//    g.fillRect(r.x, r.y, r.width, r.height);
-	//}
+	game.draw(g);
+	
 	g.dispose ();
 	this.getBufferStrategy().show ();
 
