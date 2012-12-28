@@ -24,6 +24,7 @@ public class CanvasHolder extends Canvas
 	myWidth = width;
 	myHeight = height;
 	this.createBufferStrategy (2);
+	this.getBufferStrategy().getDrawGraphics().setColor(Color.RED);
     }
 
     public void addKeyListener (ConcreteKeyListener listener)
@@ -33,9 +34,9 @@ public class CanvasHolder extends Canvas
 
     public void add (Rectangle rect, Color color)
     {
-	int [] x = { rect.x, rect.x + rect.width, rect.x + rect.width, rect.x };
-	int [] y = { rect.y, rect.y, rect.y + rect.height, rect.y + rect.height };
-	polys.add (new ColoredPolygon (x, y, 4, color));
+	//int [] x = { rect.x, rect.x + rect.width, rect.x + rect.width, rect.x };
+	//int [] y = { rect.y, rect.y, rect.y + rect.height, rect.y + rect.height };
+	//polys.add (new ColoredPolygon (x, y, 4, color));
 	rects.add (rect);
     }
 
@@ -47,31 +48,33 @@ public class CanvasHolder extends Canvas
     public void clear ()
     {
 	rects.clear ();
-	polys.clear ();
+	//polys.clear ();
     }
 
-    public void showNow ()
+    public void setColor(Color color)
+    {
+	this.getBufferStrategy().getDrawGraphics().setColor(color);
+    }
+
+    public void paint2 (Trains game)
     {	
 	Graphics g = this.getBufferStrategy ().getDrawGraphics ();
 	g.clearRect(0,0,myWidth,myHeight);
-	for (int i = 0; i < polys.size (); i++)
-	{
-	    ColoredPolygon poly = polys.get(i);
-	    g.setColor (poly.getColor ());
-	    g.fillPolygon(poly);
-	}
+	
+	for (Train player : game.getPlayers())
+	    {
+		player.draw(g);
+	    }
+	//for (Rectangle r : rects)
+	//{
+	//    g.fillRect(r.x, r.y, r.width, r.height);
+	//}
 	g.dispose ();
 	this.getBufferStrategy().show ();
-	/*for (int i = 0; i < rects.size (); i++)
-	{
-	    Rectangle rect = rects.get(i);
-	    g.setColor (rect.getColor ());
-	    g.fillRect(rect.getX(),rect.getY(),rect.getWidth(),rect.getHeight());
-	    }*/
-	//Toolkit.getDefaultToolkit().sync();
+
 	repaints++;
 	if (repaints%60 == 0) System.out.println ("60 paints");
-	if (rects.size () == 0) System.out.println ("painting blank!");
+	//if (rects.size () == 0) System.out.println ("painting blank!");
     }
 
     public void paint (Graphics g2)
@@ -88,8 +91,6 @@ public class CanvasHolder extends Canvas
 	this.getBufferStrategy().show ();
 	Toolkit.getDefaultToolkit().sync();
 	repaints++;
-	if (repaints%60 == 0) System.out.println ("60 paints");
-	if (rects.size () == 0) System.out.println ("painting blank!");
     }
 
     public static void main (String [] args)

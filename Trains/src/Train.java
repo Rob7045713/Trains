@@ -4,15 +4,19 @@ import java.util.Iterator;
 import java.awt.Rectangle;
 import java.lang.Integer;
 import java.lang.Double;
+import java.awt.Color;
+import java.awt.Graphics;
 
 public class Train
 {
-	public static final double BASE_SPEED = .0025;
-	public static final float MIN_SPEED = .0025f * 60;
-	public static final float ACCEL = .00001f * 60;
+    public static final double BASE_SPEED = .0025;
+    public static final float MIN_SPEED = .0025f/16.0f;
+    public static final float ACCEL = .00001f/16.0f/16.0f;
     public static final double ACCELERATION = .00001;
     public static final double COLLISION_WIDTH = .002;
-    public static final double ACCELERATION_WIDTH = .04;
+    public static final double ACCELERATION_WIDTH = .08;
+    private static final boolean DRAW_HEAD_BOX = true;
+    private static final boolean DRAW_TAIL_BOX = false;
 
     private ArrayDeque<Vector2D> segments;
     private Vector2D headPosition;
@@ -23,10 +27,12 @@ public class Train
     private float tailAcceleration;
     private boolean isDead;
     public enum End { HEAD, TAIL }
+    private Color color;
     
-    public Train()
+    public Train(Color color)
     {
     	this(new Vector2D(0,0), VectorDirection.RIGHT, 0.0f);
+	this.color = color;
     }
 
     public Train(Vector2D position, Vector2D direction, float length)
@@ -46,6 +52,29 @@ public class Train
     	segments.add(segment);
     }
        
+    public void draw(Graphics g)
+    {
+	for (Rectangle r : getRectangles())
+	    {
+		g.setColor(color);
+		g.fillRect(r.x, r.y, r.width, r.height);
+	    }
+
+	if (DRAW_HEAD_BOX)
+	    {
+		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 64));
+		Rectangle r = getEndBox(End.HEAD);
+		g.fillRect(r.x, r.y, r.width, r.height);
+	    }
+	
+	if (DRAW_TAIL_BOX)
+	    {
+		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 32));
+		Rectangle r = getEndBox(End.TAIL);
+		g.fillRect(r.x, r.y, r.width, r.height);
+	    }
+    }
+
     public void init(Vector2D position, Vector2D direction, float length)
     {
     	// TODO find out if this is necessary
@@ -58,10 +87,11 @@ public class Train
     	this.isDead = false;
     	
     	Vector2D segment = new Vector2D(direction);
-    	segment.mult(length);
+    	segment = segment.mult(-1.0f*length);
     	
     	segments = new ArrayDeque<Vector2D>();
     	segments.add(segment);
+	System.out.println (segment.x + "," + segment.y);
     }
     
     public void setDead(boolean isDead)
@@ -107,14 +137,18 @@ public class Train
     private void updatePositions(long elapsed)
     {
     	// calculate new speed
-    	headSpeed += headAcceleration * elapsed;
-    
+    	headSpeed += headAcceleration * (float)elapsed;
+
     	if (headSpeed < MIN_SPEED)
     		headSpeed = MIN_SPEED;
     	
     	// calculate change in position and update head position
-    	Vector2D deltaPos = (direction).mult(headSpeed * elapsed);
+    	Vector2D deltaPos = (direction).mult(headSpeed * (float)elapsed);
+	//System.out.println ("direction is " + direction.x + "," + direction.y);
+	//System.out.println ("headSpeed is " + headSpeed + " while elapsed is " + elapsed);
+	//System.out.println (headPosition.x + "," + headPosition.y + " added to " + deltaPos.x + "," + deltaPos.y);
     	headPosition = headPosition.add(deltaPos);
+	//System.out.println (headPosition.x + "," + headPosition.y);
     	
     	// check if direction has changed => push new segment
     	if (!direction.equals(segments.getFirst().norm().mult(-1.0f)))
@@ -178,7 +212,7 @@ public class Train
     	}
     	else
     	{
-    		Vector2D tailPosition = getTailPosition();
+   		Vector2D tailPosition = getTailPosition();
         	x = (int) (ppu * (tailPosition.x - ACCELERATION_WIDTH / 2));
     		y = (int) (ppu * (tailPosition.y - ACCELERATION_WIDTH / 2));
     	}
@@ -200,7 +234,7 @@ public class Train
     	
     	if (accelCollisions > 0)
     	{
-    		headAcceleration = (float) ACCEL;
+    		headAcceleration = ACCEL;
     	}
     	else
     	{
@@ -238,7 +272,7 @@ public class Train
     	
     	ArrayList<Rectangle> rectangles = getRectangles();
     	
-    	while (begin > 0)
+    	while (begin > 0 && !rectangles.isEmpty())
     	{
     		rectangles.remove(0);
     		begin--;
@@ -291,6 +325,7 @@ public class Train
     				(int) (ppu * width), (int) (ppu * height));
     		
     		rectangles.add(r);
+		pos = pos.add(segment);
     	}
     	
     	return rectangles;

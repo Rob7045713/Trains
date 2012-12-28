@@ -20,6 +20,7 @@ public class Trains
     private static final int WALL_WIDTH = WIDTH/500;
     private static final long MAX_FRAMERATE = 60;
     private static final int NUM_PLAYERS = 2;
+    private static final Color[] playerColors = {Color.RED, Color.BLUE, Color.GREEN, Color.RED};
     
     private CanvasHolder canvasHolder;
     private ArrayList<Train> players;
@@ -41,7 +42,7 @@ public class Trains
     	players = new ArrayList<Train>();
     	for(int i = 0; i < NUM_PLAYERS; i++)
     	{
-    		players.add(new Train());
+	    players.add(new Train(playerColors[i]));
     	}
     	
     	// init input manager
@@ -208,9 +209,9 @@ public class Trains
     {
     	// TODO update this to push drawing to players
     	canvasHolder.clear ();
-		ShowTrain(players.get(0),Color.BLUE);
-		ShowTrain(players.get(1),Color.RED);
-		canvasHolder.repaint();
+	//ShowTrain(players.get(0),Color.BLUE);
+	//	ShowTrain(players.get(1),Color.RED);
+	canvasHolder.paint2(this);
     }
     
     /**
@@ -218,29 +219,28 @@ public class Trains
      */
     private void runRound()
     {
-    	long currentTime = System.currentTimeMillis();
     	long oldTime;
+	long elapsed = 0;
+      	long frameTime = 1000 / MAX_FRAMERATE;
 	
     	//System.out.println ("Press esc to exit...");
 	
     	while (!isQuit)
     	{
     		// update / draw
-	    long elapsed = 0;
 		oldTime = System.currentTimeMillis();
     		update(elapsed);
     		draw();
 		elapsed = System.currentTimeMillis()-oldTime;
 
     		// framerate limiter
-    		long frameTime = 1000 / MAX_FRAMERATE;
     		if (elapsed < frameTime)
     		{
-		    try{Thread.sleep (Math.max (frameTime,elapsed));}catch (InterruptedException ie) {System.out.println ("Interrupted!!!");}
+		    try{Thread.sleep (frameTime - elapsed);}catch (InterruptedException ie) {System.out.println ("Interrupted!!!");}
     		
-    			currentTime = System.currentTimeMillis();
-    			elapsed = currentTime - oldTime;
+    			elapsed = System.currentTimeMillis() - oldTime;
     		}
+		System.out.println (1000/elapsed);
     		
     	}
 	
@@ -273,9 +273,9 @@ public class Trains
     		canvasHolder.add(r, color);
     	}
     	
-    	color = new Color(color.getRed(), color.getBlue(), color.getGreen(), 64);
+    	//color = new Color(color.getRed(), color.getGreen(), color.getBlue(), 64);
     	canvasHolder.add(train.getEndBox(Train.End.HEAD), color);
-    	canvasHolder.add(train.getEndBox(Train.End.TAIL), color);
+    	//canvasHolder.add(train.getEndBox(Train.End.TAIL), color);
     }
 
     /**
