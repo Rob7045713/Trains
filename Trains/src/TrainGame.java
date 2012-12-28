@@ -20,6 +20,8 @@ public class TrainGame
     private static final long MAX_FRAMERATE = 60;
     private static final int NUM_PLAYERS = 2;
     private static final Color[] playerColors = {Color.RED, Color.BLUE, Color.GREEN, Color.RED};
+    private enum Layout {QWERTY, DVORAK}
+    private static final Layout KEYBOARD_LAYOUT = Layout.QWERTY;
     
     private CanvasHolder canvasHolder;
     private ArrayList<Train> players;
@@ -73,7 +75,14 @@ public class TrainGame
     	try {
     		
     		// bind player keys
-    		bindPlayerKeys(0, KeyEvent.VK_COMMA, KeyEvent.VK_O, KeyEvent.VK_A, KeyEvent.VK_E);
+    		if (KEYBOARD_LAYOUT == Layout.QWERTY)
+    		{
+    			bindPlayerKeys(0, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D);
+    		}
+    		if (KEYBOARD_LAYOUT == Layout.DVORAK)
+    		{
+    			bindPlayerKeys(0, KeyEvent.VK_COMMA, KeyEvent.VK_O, KeyEvent.VK_A, KeyEvent.VK_E);
+    		}
     		bindPlayerKeys(1, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT);
 			
     		// bind general keys
@@ -139,7 +148,7 @@ public class TrainGame
     /**
      * Initialize the game to the beginning state.
      */
-    private void init()
+    public void init()
     {
     	Vector2D[] positions = {
     			new Vector2D(.8f, (float) (.4 / PIXELS_PER_UNIT * HEIGHT)),
@@ -300,7 +309,7 @@ public class TrainGame
 
 		@Override
 		public void draw(TrainGame game, Graphics g) {
-			Color winner = Color.WHITE;
+			Color winner = Color.BLACK;
 			
 			for (Train player : players)
 			{
@@ -308,7 +317,7 @@ public class TrainGame
 					winner = player.getColor();
 			}
 			
-			g.setColor(new Color(winner.getRed(), winner.getGreen(), winner.getBlue(), 16));
+			g.setColor(new Color(winner.getRed(), winner.getGreen(), winner.getBlue(), 64));
 			g.fillRect(BOUNDARY.x, BOUNDARY.y, BOUNDARY.width, BOUNDARY.height);
 			
 			for (Train player : game.getPlayers())

@@ -9,15 +9,31 @@ import java.awt.Graphics;
 
 public class Train
 {
-    public static final double BASE_SPEED = .0025;
-    public static final float MIN_SPEED = .0025f/16.0f;
-    public static final float ACCEL = .00001f/16.0f/16.0f;
-    public static final double ACCELERATION = .00001;
-    public static final double COLLISION_WIDTH = .002;
-    public static final double ACCELERATION_WIDTH = .08;
+	/*
+	 * Physics constants
+	 */
+    public static final float MIN_SPEED 			= .0025f / 16.0f;
+    public static final float ACCEL 				= .00001f / (16.0f * 16.0f);
+    public static final float COLLISION_WIDTH 		= .002f;
+    public static final float ACCEL_WIDTH 			= .08f;
+    public static final float DECEL_MODIFIER 		= 1.0f;
+    public static final float SELF_ACCEL_MODIFIER 	= 0.0f;
+    public static final int MULTI_ACCEL 			= 1;
+    
+    /*
+     * Drawing options
+     */
     private static final boolean DRAW_HEAD_BOX = true;
     private static final boolean DRAW_TAIL_BOX = false;
 
+    /*
+     * Misc
+     */
+    public enum End { HEAD, TAIL }
+    
+    /*
+     * Class fields
+     */
     private ArrayDeque<Vector2D> segments;
     private Vector2D headPosition;
     private Vector2D direction;
@@ -26,7 +42,6 @@ public class Train
     private float headAcceleration;
     private float tailAcceleration;
     private boolean isDead;
-    public enum End { HEAD, TAIL }
     private Color color;
     
     public Train(Color color)
@@ -59,24 +74,24 @@ public class Train
        
     public void draw(Graphics g)
     {
-	for (Rectangle r : getRectangles())
-	    {
-		g.setColor(color);
-		g.fillRect(r.x, r.y, r.width, r.height);
-	    }
+    	for (Rectangle r : getRectangles())
+    	{
+    		g.setColor(color);
+    		g.fillRect(r.x, r.y, r.width, r.height);
+    	}
 
-	if (DRAW_HEAD_BOX)
+    	if (DRAW_HEAD_BOX)
 	    {
-		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 64));
-		Rectangle r = getEndBox(End.HEAD);
-		g.fillRect(r.x, r.y, r.width, r.height);
+    		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 64));
+    		Rectangle r = getEndBox(End.HEAD);
+    		g.fillRect(r.x, r.y, r.width, r.height);
 	    }
 	
-	if (DRAW_TAIL_BOX)
+    	if (DRAW_TAIL_BOX)
 	    {
-		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 32));
-		Rectangle r = getEndBox(End.TAIL);
-		g.fillRect(r.x, r.y, r.width, r.height);
+    		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 32));
+    		Rectangle r = getEndBox(End.TAIL);
+    		g.fillRect(r.x, r.y, r.width, r.height);
 	    }
     }
 
@@ -96,7 +111,7 @@ public class Train
     	
     	segments = new ArrayDeque<Vector2D>();
     	segments.add(segment);
-	System.out.println (segment.x + "," + segment.y);
+    	//System.out.println (segment.x + "," + segment.y);
     }
     
     public void setDead(boolean isDead)
@@ -130,7 +145,7 @@ public class Train
     	// check for player collisions
     	for (Train player : game.getPlayers())
     	{
-    		if (checkCollisions(player) > 0)
+    		if (player.checkCollisions(this) > 0)
     			isDead = true;
     	}
     	
@@ -149,11 +164,11 @@ public class Train
     	
     	// calculate change in position and update head position
     	Vector2D deltaPos = (direction).mult(headSpeed * (float)elapsed);
-	//System.out.println ("direction is " + direction.x + "," + direction.y);
-	//System.out.println ("headSpeed is " + headSpeed + " while elapsed is " + elapsed);
-	//System.out.println (headPosition.x + "," + headPosition.y + " added to " + deltaPos.x + "," + deltaPos.y);
+    	//System.out.println ("direction is " + direction.x + "," + direction.y);
+    	//System.out.println ("headSpeed is " + headSpeed + " while elapsed is " + elapsed);
+    	//System.out.println (headPosition.x + "," + headPosition.y + " added to " + deltaPos.x + "," + deltaPos.y);
     	headPosition = headPosition.add(deltaPos);
-	//System.out.println (headPosition.x + "," + headPosition.y);
+    	//System.out.println (headPosition.x + "," + headPosition.y);
     	
     	// check if direction has changed => push new segment
     	if (!direction.equals(segments.getFirst().norm().mult(-1.0f)))
@@ -204,22 +219,21 @@ public class Train
     
     public Rectangle getEndBox(End end)
     {
-    	Rectangle r;
     	int ppu = TrainGame.PIXELS_PER_UNIT;
-		int width = (int) (ACCELERATION_WIDTH * ppu);
+		int width = (int) (ACCEL_WIDTH * ppu);
 		int x = 0;
 		int y = 0;
     	
     	if (end == End.HEAD)
     	{    		
-    		x = (int) (ppu * (headPosition.x - ACCELERATION_WIDTH / 2));
-    		y = (int) (ppu * (headPosition.y - ACCELERATION_WIDTH / 2));
+    		x = (int) (ppu * (headPosition.x - ACCEL_WIDTH / 2));
+    		y = (int) (ppu * (headPosition.y - ACCEL_WIDTH / 2));
     	}
     	else
     	{
    		Vector2D tailPosition = getTailPosition();
-        	x = (int) (ppu * (tailPosition.x - ACCELERATION_WIDTH / 2));
-    		y = (int) (ppu * (tailPosition.y - ACCELERATION_WIDTH / 2));
+        	x = (int) (ppu * (tailPosition.x - ACCEL_WIDTH / 2));
+    		y = (int) (ppu * (tailPosition.y - ACCEL_WIDTH / 2));
     	}
     	
     	return new Rectangle(x, y, width, width);
@@ -239,11 +253,15 @@ public class Train
     	
     	if (accelCollisions > 0)
     	{
-    		headAcceleration = ACCEL;
+    		headAcceleration = ACCEL * Math.min(accelCollisions, MULTI_ACCEL); // TODO make this more versitile
+    	}
+    	else if (checkCollisions(r) > 0 && SELF_ACCEL_MODIFIER > 0) // TODO figure out this + multi-accel
+    	{
+    		headAcceleration = ACCEL * SELF_ACCEL_MODIFIER;
     	}
     	else
     	{
-    		headAcceleration = (float) (-1 * ACCEL);
+    		headAcceleration = (float) (-1 * ACCEL * DECEL_MODIFIER);
     	}
     	
 		r = getEndBox(End.TAIL);
@@ -258,11 +276,15 @@ public class Train
     	
     	if (accelCollisions > 0)
     	{
-    		tailAcceleration = (float) ACCEL;
+    		tailAcceleration = (float) ACCEL * Math.min(accelCollisions, MULTI_ACCEL); // TODO make this more versitile
+    	}
+    	else if (checkCollisions(r) > 0 && SELF_ACCEL_MODIFIER > 0) // TODO figure out this + multi-accel
+    	{
+    		tailAcceleration = ACCEL * SELF_ACCEL_MODIFIER;
     	}
     	else
     	{
-    		tailAcceleration = (float) (-1 * ACCEL);
+    		tailAcceleration = (float) (-1 * ACCEL * DECEL_MODIFIER);
     	}
     }
     
@@ -294,7 +316,11 @@ public class Train
     
     public int checkCollisions(Train train)
     {
-    	return checkCollisions(train, false);
+    	int begin = (train == this) ? 2 : 0;
+    	
+    	Rectangle r = train.getRectangles().get(0);
+    	
+    	return checkCollisions(r, begin);
     }
 
     public Vector2D getTailPosition()
@@ -308,7 +334,7 @@ public class Train
     }
     
     public ArrayList<Rectangle> getRectangles()
-    {
+    {	
     	ArrayList<Rectangle> rectangles = new ArrayList<Rectangle>();
     	Vector2D pos = new Vector2D(headPosition);
     	
@@ -334,34 +360,5 @@ public class Train
     	}
     	
     	return rectangles;
-    }
-    
-    // TODO probably remove this
-    public int checkCollisions(Train train, boolean checkAcceleration)
-    {
-    	int begin = 0;
-    	
-    	if (train == this)
-    	{
-    		begin = 2;
-    		
-    		if (checkAcceleration)
-    		{
-    			return 0;
-    		}
-    	}
-    	
-    	Rectangle r = train.getRectangles().get(0);
-    	
-    	if (checkAcceleration)
-    	{
-    		int ppu = TrainGame.PIXELS_PER_UNIT;
-    		int width = (int) (ACCELERATION_WIDTH * ppu);
-    		int x = (int) (ppu * (headPosition.x - ACCELERATION_WIDTH / 2));
-    		int y = (int) (ppu * (headPosition.y - ACCELERATION_WIDTH / 2));
-    		r = new Rectangle(x, y, width, width);
-    	}
-    	
-    	return checkCollisions(r, begin);
     }
 }
