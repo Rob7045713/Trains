@@ -311,6 +311,10 @@ public class TrainGame
 			g.setColor(new Color(winner.getRed(), winner.getGreen(), winner.getBlue(), 16));
 			g.fillRect(BOUNDARY.x, BOUNDARY.y, BOUNDARY.width, BOUNDARY.height);
 			
+			for (Train player : game.getPlayers())
+			{
+				player.draw(g);
+			}
 		}
     	
     }
