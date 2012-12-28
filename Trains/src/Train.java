@@ -17,7 +17,7 @@ public class Train
     public static final float COLLISION_WIDTH 		= .002f;
     public static final float ACCEL_WIDTH 			= .08f;
     public static final float DECEL_MODIFIER 		= 1.0f;
-    public static final float SELF_ACCEL_MODIFIER 	= 0.0f;
+    public static final float SELF_ACCEL_MODIFIER 	= -1.0f;
     public static final int MULTI_ACCEL 			= 1;
     
     /*
@@ -241,6 +241,8 @@ public class Train
     
     private void updateAccelerations(TrainGame game)
     {
+    	// TODO combine these into a method somehow
+    	
     	int accelCollisions = 0;
     	
 		Rectangle r = getEndBox(End.HEAD);
@@ -255,7 +257,7 @@ public class Train
     	{
     		headAcceleration = ACCEL * Math.min(accelCollisions, MULTI_ACCEL); // TODO make this more versitile
     	}
-    	else if (checkCollisions(r) > 0 && SELF_ACCEL_MODIFIER > 0) // TODO figure out this + multi-accel
+    	else if (checkCollisions(r) > 0 && SELF_ACCEL_MODIFIER >= 0) // TODO figure out this + multi-accel
     	{
     		headAcceleration = ACCEL * SELF_ACCEL_MODIFIER;
     	}
@@ -278,7 +280,7 @@ public class Train
     	{
     		tailAcceleration = (float) ACCEL * Math.min(accelCollisions, MULTI_ACCEL); // TODO make this more versitile
     	}
-    	else if (checkCollisions(r) > 0 && SELF_ACCEL_MODIFIER > 0) // TODO figure out this + multi-accel
+    	else if (checkCollisions(r) > 0 && SELF_ACCEL_MODIFIER >= 0) // TODO figure out this + multi-accel
     	{
     		tailAcceleration = ACCEL * SELF_ACCEL_MODIFIER;
     	}
