@@ -43,6 +43,7 @@ public class Train
     private float tailAcceleration;
     private boolean isDead;
     private Color color;
+    private boolean canTurn; // XXX this is a quick-fix, consider changing
     
     public Train(Color color)
     {
@@ -128,7 +129,11 @@ public class Train
     {
     	if (! (this.direction.equals(direction) || this.direction.mult(-1).equals(direction)))
     	{
-    		this.direction = direction.copy();
+    		if (canTurn) // XXX see canTurn
+    		{
+    			this.direction = direction.copy();
+    			canTurn = false;
+    		}
     	}
     }
 
@@ -141,6 +146,8 @@ public class Train
     {
     	updateAccelerations(game);
     	updatePositions(elapsed);
+    	
+    	canTurn = false; // XXX see canTurn
 
     	// check for player collisions
     	for (Train player : game.getPlayers())

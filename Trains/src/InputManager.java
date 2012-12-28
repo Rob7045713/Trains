@@ -53,9 +53,7 @@ public class InputManager {
 		Iterator<KeyEvent> iterator = listener.getKeyEventsIterator();
 		while (iterator.hasNext())
 		{
-			//System.out.println ("key pressed...");
 			execute(iterator.next().getKeyCode());
-			iterator.remove();
 		}
 	}
 }

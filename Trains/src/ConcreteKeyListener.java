@@ -2,6 +2,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+// TODO combine this with InputManager
 public class ConcreteKeyListener implements KeyListener
 {
     ArrayList<KeyEvent> keyEvents;
@@ -13,18 +14,29 @@ public class ConcreteKeyListener implements KeyListener
 
     public Iterator<KeyEvent> getKeyEventsIterator ()
     {
-    	Iterator<KeyEvent> iterator = keyEvents.iterator ();
-		return iterator;
+    	synchronized (this)
+    	{
+    		ArrayList<KeyEvent> keys = new ArrayList<KeyEvent>();
+    		keys.addAll(keyEvents); 	
+    		keyEvents.clear();
+    		return keys.iterator();
+    	}
     }
 
     public void clear ()
     {
-    	keyEvents.clear ();	
+    	synchronized (this) 
+    	{
+    		keyEvents.clear ();	
+    	}
     }
 
     public void keyPressed (KeyEvent aKeyEvent)
     {
-    	keyEvents.add (aKeyEvent);
+    	synchronized (this) 
+    	{
+    		keyEvents.add (aKeyEvent);
+    	}
     }
 
     public void keyTyped (KeyEvent e)
