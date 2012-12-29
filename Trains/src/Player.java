@@ -7,7 +7,7 @@ import java.lang.Double;
 import java.awt.Color;
 import java.awt.Graphics;
 
-public class Train
+public class Player
 {
 	/*
 	 * Physics constants
@@ -17,7 +17,7 @@ public class Train
     public static final float COLLISION_WIDTH 		= .002f;
     public static final float ACCEL_WIDTH 			= .08f;
     public static final float DECEL_MODIFIER 		= 1.0f;
-    public static final float SELF_ACCEL_MODIFIER 	= -1.0f;
+    public static final float SELF_ACCEL_MODIFIER 	= -1.0f; // -1.0f is default behavior
     public static final int MULTI_ACCEL 			= 1;
     
     /*
@@ -45,13 +45,25 @@ public class Train
     private Color color;
     private boolean canTurn; // XXX this is a quick-fix, consider changing
     
-    public Train(Color color)
+    /**
+     * Color only constructor for player.
+     * 
+     * @param color <code>Color</code> to use
+     */
+    public Player(Color color)
     {
-    	this(new Vector2D(0,0), VectorDirection.RIGHT, 0.0f);
-	this.color = color;
+    	this(new Vector2D(0,0), VectorDirection.RIGHT, 0.0f, color);
     }
 
-    public Train(Vector2D position, Vector2D direction, float length)
+    /**
+     * Full constructor for player.
+     * 
+     * @param position <code>Vector2D</code> position to use
+     * @param direction <code>Vector2D</code> direction to use, see <code>VectorDirection</code> constants
+     * @param length length to use
+     * @param color <code>Color</code> to use
+     */
+    public Player(Vector2D position, Vector2D direction, float length, Color color)
     {
     	this.headPosition = position;
     	this.direction = direction.copy();
@@ -60,6 +72,7 @@ public class Train
     	this.headAcceleration = 0.0f;
     	this.tailAcceleration = 0.0f;
     	this.isDead = false;
+    	this.color = color;
     	
     	Vector2D segment = new Vector2D(direction);
     	segment.mult(length);
@@ -68,19 +81,31 @@ public class Train
     	segments.add(segment);
     }
     
+    /**
+     * Returns the color of the player.
+     * 
+     * @return <code>Color</code> of the train
+     */
     public Color getColor()
     {
     	return color;
     }
        
+    /**
+     * Draw the player to a <code>Graphics</code>.
+     * 
+     * @param g <code>Graphics</code> to draw to
+     */
     public void draw(Graphics g)
     {
+    	// draw the physical train
     	for (Rectangle r : getRectangles())
     	{
     		g.setColor(color);
     		g.fillRect(r.x, r.y, r.width, r.height);
     	}
 
+    	// draw the head acceleration box
     	if (DRAW_HEAD_BOX)
 	    {
     		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 64));
@@ -88,6 +113,7 @@ public class Train
     		g.fillRect(r.x, r.y, r.width, r.height);
 	    }
 	
+    	// draw the tail acceleration box
     	if (DRAW_TAIL_BOX)
 	    {
     		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 32));
@@ -96,6 +122,13 @@ public class Train
 	    }
     }
 
+    /**
+     * Initialize the player's state.
+     * 
+     * @param position <code>Vector2D</code> position to use
+     * @param direction <code>Vector2D</code> direction to use, see VectorDirection constants
+     * @param length length to use
+     */
     public void init(Vector2D position, Vector2D direction, float length)
     {
     	// TODO find out if this is necessary
@@ -115,16 +148,31 @@ public class Train
     	//System.out.println (segment.x + "," + segment.y);
     }
     
+    /**
+     * Set if the player is dead.
+     * 
+     * @param isDead <code>true</code> to set the train to dead
+     */
     public void setDead(boolean isDead)
     {
     	this.isDead = isDead;
     }
       
+    /**
+     * Returns <code>true</code> if the player is dead.
+     *
+     * @return <code>true</code> if the player is dead
+     */
     public boolean isDead()
     {
     	return isDead;
     }
  
+    /**
+     * Set the direction of the player.
+     * 
+     * @param direction <code>Vector2D</code> direction to use, see <code>VectorDirection</code> constants
+     */
     public void setDirection(Vector2D direction)
     {
     	if (! (this.direction.equals(direction) || this.direction.mult(-1).equals(direction)))
@@ -137,11 +185,22 @@ public class Train
     	}
     }
 
+    /**
+     * Returns the position of the player.
+     * 
+     * @return position of the player
+     */
     public Vector2D getPosition()
     {
     	return headPosition;
     }
     
+    /**
+     * Update the player based on the the elapsed time.
+     * 
+     * @param elapsed time in milliseconds since the last update
+     * @param game reference to <code>TrainGame</code> the player belongs to
+     */
     public void update(long elapsed, TrainGame game)
     {
     	updateAccelerations(game);
@@ -150,7 +209,7 @@ public class Train
     	canTurn = false; // XXX see canTurn
 
     	// check for player collisions
-    	for (Train player : game.getPlayers())
+    	for (Player player : game.getPlayers())
     	{
     		if (player.checkCollisions(this) > 0)
     			isDead = true;
@@ -161,6 +220,11 @@ public class Train
     		isDead = true;
     }
     
+    /**
+     * Do the physics updates for the game.
+     * 
+     * @param elapsed time since last update
+     */
     private void updatePositions(long elapsed)
     {
     	// calculate new speed
@@ -171,11 +235,7 @@ public class Train
     	
     	// calculate change in position and update head position
     	Vector2D deltaPos = (direction).mult(headSpeed * (float)elapsed);
-    	//System.out.println ("direction is " + direction.x + "," + direction.y);
-    	//System.out.println ("headSpeed is " + headSpeed + " while elapsed is " + elapsed);
-    	//System.out.println (headPosition.x + "," + headPosition.y + " added to " + deltaPos.x + "," + deltaPos.y);
     	headPosition = headPosition.add(deltaPos);
-    	//System.out.println (headPosition.x + "," + headPosition.y);
     	
     	// check if direction has changed => push new segment
     	if (!direction.equals(segments.getFirst().norm().mult(-1.0f)))
@@ -224,6 +284,12 @@ public class Train
     	}
     }
     
+    /**
+     * Returns a square <code>Rectangle</code> centered on the specified end of the player.
+     * 
+     * @param end end of the player to get a box around
+     * @return square <code>Rectangle</code> centered on the end
+     */
     public Rectangle getEndBox(End end)
     {
     	int ppu = TrainGame.PIXELS_PER_UNIT;
@@ -246,6 +312,11 @@ public class Train
     	return new Rectangle(x, y, width, width);
     }
     
+    /**
+     * Update the accelerations to the appropriate values.
+     * 
+     * @param game reference to <code>TrainGame</code> the player belongs to
+     */
     private void updateAccelerations(TrainGame game)
     {
     	// TODO combine these into a method somehow
@@ -254,7 +325,7 @@ public class Train
     	
 		Rectangle r = getEndBox(End.HEAD);
     	
-    	for (Train player : game.getPlayers())
+    	for (Player player : game.getPlayers())
     	{
     		if (player != this)
     			accelCollisions += player.checkCollisions(r);
@@ -264,7 +335,7 @@ public class Train
     	{
     		headAcceleration = ACCEL * Math.min(accelCollisions, MULTI_ACCEL); // TODO make this more versitile
     	}
-    	else if (checkCollisions(r) > 0 && SELF_ACCEL_MODIFIER >= 0) // TODO figure out this + multi-accel
+    	else if (checkCollisions(r) > 0) // TODO figure out this + multi-accel
     	{
     		headAcceleration = ACCEL * SELF_ACCEL_MODIFIER;
     	}
@@ -277,7 +348,7 @@ public class Train
     	
 		accelCollisions = 0;
 		
-    	for (Train player : game.getPlayers())
+    	for (Player player : game.getPlayers())
     	{
     		if (player != this)
     			accelCollisions += player.checkCollisions(r);
@@ -287,7 +358,7 @@ public class Train
     	{
     		tailAcceleration = (float) ACCEL * Math.min(accelCollisions, MULTI_ACCEL); // TODO make this more versitile
     	}
-    	else if (checkCollisions(r) > 0 && SELF_ACCEL_MODIFIER >= 0) // TODO figure out this + multi-accel
+    	else if (checkCollisions(r) > 0) // TODO figure out this + multi-accel
     	{
     		tailAcceleration = ACCEL * SELF_ACCEL_MODIFIER;
     	}
@@ -297,11 +368,24 @@ public class Train
     	}
     }
     
+    /**
+     * Check for collisions between the given <code>Rectangle</code> and the player.
+     * 
+     * @param r <code>Rectangle</code> to check for collisions with
+     * @return number of segments collided with
+     */
     public int checkCollisions(Rectangle r)
     {
     	return checkCollisions(r, 0);
     }
     
+    /**
+     * Check for collisions ignoring the first number of segments.
+     * 
+     * @param r <code>Rectangle</code> to check for collisions with
+     * @param begin first segment to check with
+     * @return number of segments collided with
+     */
     private int checkCollisions(Rectangle r, int begin)
     {
     	int numCollisions = 0;
@@ -323,15 +407,26 @@ public class Train
     	return numCollisions;
     }
     
-    public int checkCollisions(Train train)
+    /**
+     * Check for collisions with another player
+     * 
+     * @param player <code>Player</code> to check for collisions with
+     * @return non-zero if there is a collision
+     */
+    public int checkCollisions(Player player)
     {
-    	int begin = (train == this) ? 2 : 0;
+    	int begin = (player == this) ? 2 : 0;
     	
-    	Rectangle r = train.getRectangles().get(0);
+    	Rectangle r = player.getRectangles().get(0);
     	
     	return checkCollisions(r, begin);
     }
 
+    /**
+     * Returns the <code>Vector2D</code> position of the tail end of the player
+     * 
+     * @return <code>Vector2D</code> position of the tail
+     */
     public Vector2D getTailPosition()
     {
     	Vector2D tailPosition = headPosition;
@@ -342,6 +437,11 @@ public class Train
     	return tailPosition;
     }
     
+    /**
+     * Returns a list of rectangles which define the player.
+     * 
+     * @return list of rectangles which define the player
+     */
     public ArrayList<Rectangle> getRectangles()
     {	
     	ArrayList<Rectangle> rectangles = new ArrayList<Rectangle>();

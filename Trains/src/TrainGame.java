@@ -24,7 +24,7 @@ public class TrainGame
     private static final Layout KEYBOARD_LAYOUT = Layout.QWERTY;
     
     private CanvasHolder canvasHolder;
-    private ArrayList<Train> players;
+    private ArrayList<Player> players;
     private InputManager inputManager;
     private ConcreteKeyListener listener;
     private boolean isQuit;
@@ -40,10 +40,10 @@ public class TrainGame
     	canvasHolder = new CanvasHolder(WIDTH, HEIGHT);
     	
     	// init player list
-    	players = new ArrayList<Train>();
+    	players = new ArrayList<Player>();
     	for(int i = 0; i < NUM_PLAYERS; i++)
     	{
-	    players.add(new Train(playerColors[i]));
+	    players.add(new Player(playerColors[i]));
     	}
     	
     	// init input manager
@@ -53,8 +53,7 @@ public class TrainGame
     	initKeyBindings();
     	
     	// init state
-    	state = new RunRoundState();
-    	
+    	state = new RunRoundState(); 	
     }
  
     /**
@@ -62,7 +61,7 @@ public class TrainGame
      * 
      * @return A list of players in the game
      */
-    public ArrayList<Train> getPlayers()
+    public ArrayList<Player> getPlayers()
     {
     	return players;
     }
@@ -115,7 +114,7 @@ public class TrainGame
     private void bindPlayerKeys(int player, int up, int down, int left, int right)
     {
     	try {
-			Method setHeading = Train.class.getMethod("setDirection", Vector2D.class);
+			Method setHeading = Player.class.getMethod("setDirection", Vector2D.class);
 			Object[] upObj = {VectorDirection.UP};
 			Object[] rightObj = {VectorDirection.RIGHT};
 			Object[] downObj = {VectorDirection.DOWN};
@@ -271,14 +270,14 @@ public class TrainGame
 			inputManager.executeInput();
 			
 			// update players
-			for (Train player : players)
+			for (Player player : players)
 	    	{
 	    		player.update(elapsed, game);
 	    	}
 	    	
 			// check if down to the last player
 	    	int playersAlive = 0;
-	    	for (Train player : players)
+	    	for (Player player : players)
 	    	{
 	    		if (!player.isDead())
 	    			playersAlive++;
@@ -290,7 +289,7 @@ public class TrainGame
 
 		@Override
 		public void draw(TrainGame game, Graphics g) {
-			for (Train player : game.getPlayers())
+			for (Player player : game.getPlayers())
 			{
 				player.draw(g);
 			}
@@ -311,7 +310,7 @@ public class TrainGame
 		public void draw(TrainGame game, Graphics g) {
 			Color winner = Color.BLACK;
 			
-			for (Train player : players)
+			for (Player player : players)
 			{
 				if (!player.isDead())
 					winner = player.getColor();
@@ -320,7 +319,7 @@ public class TrainGame
 			g.setColor(new Color(winner.getRed(), winner.getGreen(), winner.getBlue(), 64));
 			g.fillRect(BOUNDARY.x, BOUNDARY.y, BOUNDARY.width, BOUNDARY.height);
 			
-			for (Train player : game.getPlayers())
+			for (Player player : game.getPlayers())
 			{
 				player.draw(g);
 			}
