@@ -1,9 +1,5 @@
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.awt.Rectangle;
-import java.lang.Integer;
-import java.lang.Double;
 import java.awt.Color;
 import java.awt.Graphics;
 
@@ -102,7 +98,7 @@ public class Player
     	for (Rectangle r : getRectangles())
     	{
     		g.setColor(color);
-    		g.fillRect(r.x, r.y, r.width, r.height);
+    		g.fillRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
     	}
 
     	// draw the head acceleration box
@@ -110,7 +106,7 @@ public class Player
 	    {
     		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 64));
     		Rectangle r = getEndBox(End.HEAD);
-    		g.fillRect(r.x, r.y, r.width, r.height);
+    		g.fillRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 	    }
 	
     	// draw the tail acceleration box
@@ -118,7 +114,7 @@ public class Player
 	    {
     		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 32));
     		Rectangle r = getEndBox(End.TAIL);
-    		g.fillRect(r.x, r.y, r.width, r.height);
+    		g.fillRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
 	    }
     }
 

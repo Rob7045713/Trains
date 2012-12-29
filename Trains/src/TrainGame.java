@@ -1,6 +1,5 @@
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -317,7 +316,7 @@ public class TrainGame
 			}
 			
 			g.setColor(new Color(winner.getRed(), winner.getGreen(), winner.getBlue(), 64));
-			g.fillRect(BOUNDARY.x, BOUNDARY.y, BOUNDARY.width, BOUNDARY.height);
+			g.fillRect(BOUNDARY.getX(), BOUNDARY.getY(), BOUNDARY.getWidth(), BOUNDARY.getHeight());
 			
 			for (Player player : game.getPlayers())
 			{
