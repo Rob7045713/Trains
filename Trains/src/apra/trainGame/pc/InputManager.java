@@ -1,6 +1,9 @@
+package apra.trainGame.pc;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import apra.trainGame.Action;
 
 
 /**

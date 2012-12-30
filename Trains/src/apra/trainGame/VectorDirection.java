@@ -1,3 +1,4 @@
+package apra.trainGame;
 import java.awt.Point;
 
 public class VectorDirection {

@@ -1,8 +1,13 @@
+package apra.trainGame;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+
+import apra.trainGame.pc.ConcreteKeyListener;
+import apra.trainGame.pc.DrawSurface;
+import apra.trainGame.pc.InputManager;
 
 /**
  * Game main class.
@@ -305,7 +310,7 @@ public class TrainGame
 					winner = player.getColor();
 			}
 			
-			ds.setColor(winner - 255 + 64);
+			ds.setColor(winner - 0xff000000 + 0x02000000);
 			ds.fillRect(BOUNDARY);
 			
 			for (Player player : game.getPlayers())

@@ -1,16 +1,21 @@
+package apra.trainGame.pc;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JFrame;
 
+import apra.trainGame.Rectangle;
+import apra.trainGame.TrainGame;
+
 
 public class DrawSurface extends Canvas {
-	public static final int BLACK = Color.BLACK.getRGB() + 255;
-	public static final int RED = Color.RED.getRGB() + 255;
-	public static final int BLUE = Color.BLUE.getRGB() + 255;
-	public static final int GREEN = Color.GREEN.getRGB() + 255;
-	public static final int YELOW = Color.YELLOW.getRGB() + 255;
-	public static final int WHITE = Color.WHITE.getRGB() + 255;
+	public static final int MAX_ALPHA = 0xff000000;
+	public static final int BLACK = Color.BLACK.getRGB() + MAX_ALPHA;
+	public static final int RED = Color.RED.getRGB() + MAX_ALPHA;
+	public static final int BLUE = Color.BLUE.getRGB() + MAX_ALPHA;
+	public static final int GREEN = Color.GREEN.getRGB() + MAX_ALPHA;
+	public static final int YELOW = Color.YELLOW.getRGB() + MAX_ALPHA;
+	public static final int WHITE = Color.WHITE.getRGB() + MAX_ALPHA;
 	
 	private Graphics g;
 	private Color backgroundColor;
@@ -32,12 +37,13 @@ public class DrawSurface extends Canvas {
     	frame.getContentPane().add(this);
     	frame.setVisible(true);
     	
-    	this.backgroundColor = new Color(backgroundColor);
+    	this.backgroundColor = new Color(backgroundColor, true);
     	
     	this.createBufferStrategy (2);
     	this.g = getBufferStrategy().getDrawGraphics();
 	}
 	
+	// TODO move this?
 	public void addKeyListener (ConcreteKeyListener listener)
     {
     	frame.addKeyListener (listener);
@@ -58,17 +64,17 @@ public class DrawSurface extends Canvas {
 	public void clear()
 	{
 		g.setColor(backgroundColor);
-		g.fillRect(0, 0, width, height);
+		g.clearRect(0, 0, width, height);
 	}
 	
 	public void setColor(int color)
 	{
-		g.setColor(new Color(color));
+		g.setColor(new Color(color, true));
 	}
 	
 	public void setBackgroundColor(int color)
 	{
-		backgroundColor = new Color(color);
+		backgroundColor = new Color(color, true);
 	}
 	
 	public void fillRect(Rectangle r)

@@ -1,7 +1,10 @@
+package apra.trainGame;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.Graphics;
+
+import apra.trainGame.pc.DrawSurface;
 
 public class Player
 {
@@ -104,7 +107,7 @@ public class Player
     	// draw the head acceleration box
     	if (DRAW_HEAD_BOX)
 	    {
-    		ds.setColor(color - 255 + 64);
+    		ds.setColor(color - 0xff000000 + 0x20000000);
     		Rectangle r = getEndBox(End.HEAD);
     		ds.fillRect(r);
 	    }
@@ -112,7 +115,7 @@ public class Player
     	// draw the tail acceleration box
     	if (DRAW_TAIL_BOX)
 	    {
-    		ds.setColor(color - 255 + 32);
+    		ds.setColor(color - 0xff000000 + 0x10000000);
     		Rectangle r = getEndBox(End.TAIL);
     		ds.fillRect(r);
 	    }
@@ -141,7 +144,6 @@ public class Player
     	
     	segments = new ArrayDeque<Vector2D>();
     	segments.add(segment);
-    	//System.out.println (segment.x + "," + segment.y);
     }
     
     /**
