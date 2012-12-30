@@ -1,4 +1,4 @@
-package apra.trainGame.pc;
+package apra.trainsGame.pc;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -1,4 +1,4 @@
-package apra.trainGame;
+package apra.trainsGame;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 

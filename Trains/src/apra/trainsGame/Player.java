@@ -1,9 +1,9 @@
-package apra.trainGame;
+package apra.trainsGame;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-import apra.trainGame.pc.DrawSurface;
-import apra.trainGame.pc.PCDriver;
+import apra.trainsGame.pc.DrawSurface;
+import apra.trainsGame.pc.PCDriver;
 
 public class Player
 {

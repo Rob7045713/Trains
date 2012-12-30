@@ -1,4 +1,4 @@
-package apra.trainGame;
+package apra.trainsGame;
 
 public class VectorDirection {
 	public static final Vector2D UP = new Vector2D(0.0f, -1.0f);

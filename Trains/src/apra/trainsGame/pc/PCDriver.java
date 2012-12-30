@@ -1,6 +1,6 @@
-package apra.trainGame.pc;
+package apra.trainsGame.pc;
 
-import apra.trainGame.TrainGame;
+import apra.trainsGame.TrainGame;
 
 public class PCDriver {
 	public static final int WIDTH = 1020;
