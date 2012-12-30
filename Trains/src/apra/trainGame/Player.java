@@ -129,7 +129,6 @@ public class Player
      */
     public void init(Vector2D position, Vector2D direction, float length)
     {
-    	// TODO find out if this is necessary
     	this.headPosition = position;
     	this.direction = direction.copy();
     	this.headSpeed = MIN_SPEED;

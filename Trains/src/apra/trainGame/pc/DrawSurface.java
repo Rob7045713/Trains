@@ -48,7 +48,6 @@ public class DrawSurface extends Canvas {
     	this.g = getBufferStrategy().getDrawGraphics();
 	}
 	
-	// TODO move this?
 	public void addKeyListener (ConcreteKeyListener listener)
     {
     	frame.addKeyListener(listener);

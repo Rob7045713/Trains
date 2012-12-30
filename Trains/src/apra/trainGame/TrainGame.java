@@ -13,7 +13,6 @@ import apra.trainGame.pc.PCDriver;
  */
 public class TrainGame
 {
-    private static final int WALL_WIDTH = PCDriver.WIDTH/500;
     private static final long MAX_FRAMERATE = 60;
     private static final int NUM_PLAYERS = 2;
     private static final int[] playerColors = {DrawSurface.RED, DrawSurface.BLUE, DrawSurface.GREEN, DrawSurface.RED};
