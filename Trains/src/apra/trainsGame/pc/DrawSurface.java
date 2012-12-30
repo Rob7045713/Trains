@@ -1,11 +1,11 @@
-package apra.trainsGame.pc;
+package apra.trainsgame.pc;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JFrame;
 
-import apra.trainsGame.Rectangle;
-import apra.trainsGame.TrainGame;
+import apra.trainsgame.Rectangle;
+import apra.trainsgame.TrainGame;
 
 
 public class DrawSurface extends Canvas {

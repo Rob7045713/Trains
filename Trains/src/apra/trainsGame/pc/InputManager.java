@@ -1,14 +1,14 @@
-package apra.trainsGame.pc;
+package apra.trainsgame.pc;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import apra.trainsGame.Action;
-import apra.trainsGame.Player;
-import apra.trainsGame.TrainGame;
-import apra.trainsGame.Vector2D;
-import apra.trainsGame.VectorDirection;
+import apra.trainsgame.Action;
+import apra.trainsgame.Player;
+import apra.trainsgame.TrainGame;
+import apra.trainsgame.Vector2D;
+import apra.trainsgame.VectorDirection;
 
 /**
  * Input manager for a game. Manages key bindings and executing commands.

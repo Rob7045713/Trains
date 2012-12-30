@@ -1,4 +1,4 @@
-package apra.trainsGame;
+package apra.trainsgame;
 
 public class Math2 {
 	public static double sign(double a)
