@@ -13,7 +13,7 @@ public class TrainGame
 {
     private static final long MAX_FRAMERATE = 60;
     private static final int NUM_PLAYERS = 2;
-    private static final int[] playerColors = {Color.RED, Color.BLUE, Color.GREEN, Color.RED};
+    private static final Color[] playerColors = {Color.RED, Color.BLUE, Color.GREEN, Color.RED};
     
     private DrawSurface drawSurface;
     private ArrayList<Player> players;
@@ -209,7 +209,7 @@ public class TrainGame
 
 		@Override
 		public void draw(TrainGame game, DrawSurface ds) {
-			int winner = Color.BLACK;
+			Color winner = Color.BLACK;
 			
 			for (Player player : players)
 			{
@@ -217,7 +217,7 @@ public class TrainGame
 					winner = player.getColor();
 			}
 			
-			ds.setColor(winner - 0xff000000 + 0x02000000);
+			ds.setColor(new Color(32, winner.getRed(), winner.getGreen(), winner.getBlue()));
 			ds.fillRect(BOUNDARY);
 			
 			for (Player player : game.getPlayers())

@@ -39,7 +39,7 @@ public class Player
     private float headAcceleration;
     private float tailAcceleration;
     private boolean isDead;
-    private int color;
+    private Color color;
     private boolean canTurn; // XXX this is a quick-fix, consider changing
     
     /**
@@ -47,7 +47,7 @@ public class Player
      * 
      * @param color <code>Color</code> to use
      */
-    public Player(int color)
+    public Player(Color color)
     {
     	this(new Vector2D(0,0), VectorDirection.RIGHT, 0.0f, color);
     }
@@ -60,7 +60,7 @@ public class Player
      * @param length length to use
      * @param color <code>Color</code> to use
      */
-    public Player(Vector2D position, Vector2D direction, float length, int color)
+    public Player(Vector2D position, Vector2D direction, float length, Color color)
     {
     	this.headPosition = position;
     	this.direction = direction.copy();
@@ -83,7 +83,7 @@ public class Player
      * 
      * @return <code>Color</code> of the train
      */
-    public int getColor()
+    public Color getColor()
     {
     	return color;
     }
@@ -105,7 +105,7 @@ public class Player
     	// draw the head acceleration box
     	if (DRAW_HEAD_BOX)
 	    {
-    		ds.setColor(color - 0xff000000 + 0x20000000);
+    		ds.setColor(new Color(64, color.getRed(), color.getGreen(), color.getBlue()));
     		Rectangle r = getEndBox(End.HEAD);
     		ds.fillRect(r);
 	    }
@@ -113,7 +113,7 @@ public class Player
     	// draw the tail acceleration box
     	if (DRAW_TAIL_BOX)
 	    {
-    		ds.setColor(color - 0xff000000 + 0x10000000);
+    		ds.setColor(new Color(32, color.getRed(), color.getGreen(), color.getBlue()));
     		Rectangle r = getEndBox(End.TAIL);
     		ds.fillRect(r);
 	    }

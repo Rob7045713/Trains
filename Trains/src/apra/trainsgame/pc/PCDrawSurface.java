@@ -22,7 +22,7 @@ public class PCDrawSurface extends Canvas implements DrawSurface {
 	
 	private JFrame frame;
 	
-	public PCDrawSurface(int width, int height, int backgroundColor)
+	public PCDrawSurface(int width, int height, apra.trainsgame.Color backgroundColor)
 	{
 		super();
 		
@@ -35,7 +35,7 @@ public class PCDrawSurface extends Canvas implements DrawSurface {
     	frame.getContentPane().add(this);
     	frame.setVisible(true);
     	
-    	this.backgroundColor = new Color(backgroundColor, true);
+    	this.backgroundColor = backgroundColor.getColor();
     	
     	this.createBufferStrategy (2);
     	this.g = getBufferStrategy().getDrawGraphics();
@@ -64,14 +64,14 @@ public class PCDrawSurface extends Canvas implements DrawSurface {
 		g.clearRect(0, 0, width, height);
 	}
 	
-	public void setColor(int color)
+	public void setColor(apra.trainsgame.Color color)
 	{
-		g.setColor(new Color(color, true));
+		g.setColor(color.getColor());
 	}
 	
-	public void setBackgroundColor(int color)
+	public void setBackgroundColor(apra.trainsgame.Color color)
 	{
-		backgroundColor = new Color(color, true);
+		backgroundColor = color.getColor();
 	}
 	
 	public void fillRect(Rectangle r)
