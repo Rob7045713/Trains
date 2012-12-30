@@ -204,7 +204,7 @@ public class Player
     	updateAccelerations(game);
     	updatePositions(elapsed);
     	
-    	canTurn = false; // XXX see canTurn
+    	canTurn = true; // XXX see canTurn
 
     	// check for player collisions
     	for (Player player : game.getPlayers())
