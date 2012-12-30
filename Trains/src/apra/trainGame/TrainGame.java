@@ -1,13 +1,9 @@
 package apra.trainGame;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.*;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import apra.trainGame.pc.ConcreteKeyListener;
 import apra.trainGame.pc.DrawSurface;
 import apra.trainGame.pc.InputManager;
+import apra.trainGame.pc.PCDriver;
 
 /**
  * Game main class.
@@ -17,22 +13,16 @@ import apra.trainGame.pc.InputManager;
  */
 public class TrainGame
 {
-    private static final int WIDTH = 1020;
-    public static final int PIXELS_PER_UNIT = WIDTH;
-    private static final int HEIGHT = 720;
-    private static final int WALL_WIDTH = WIDTH/500;
+    private static final int WALL_WIDTH = PCDriver.WIDTH/500;
     private static final long MAX_FRAMERATE = 60;
     private static final int NUM_PLAYERS = 2;
     private static final int[] playerColors = {DrawSurface.RED, DrawSurface.BLUE, DrawSurface.GREEN, DrawSurface.RED};
-    private enum Layout {QWERTY, DVORAK}
-    private static final Layout KEYBOARD_LAYOUT = Layout.QWERTY;
     
     private DrawSurface drawSurface;
     private ArrayList<Player> players;
     private InputManager inputManager;
-    private ConcreteKeyListener listener;
     private boolean isQuit;
-    private static Rectangle BOUNDARY = new Rectangle(0, 0, WIDTH, HEIGHT);
+    private static Rectangle BOUNDARY = new Rectangle(0, 0, PCDriver.WIDTH, PCDriver.HEIGHT);
     private GameState state; 
     
     /**
@@ -40,9 +30,6 @@ public class TrainGame
      */
     public TrainGame()
     {
-    	// init canvas holder
-    	drawSurface = new DrawSurface(WIDTH, HEIGHT, DrawSurface.WHITE);
-    	
     	// init player list
     	players = new ArrayList<Player>();
     	for(int i = 0; i < NUM_PLAYERS; i++)
@@ -50,16 +37,19 @@ public class TrainGame
     		players.add(new Player(playerColors[i]));
     	}
     	
-    	// init input manager
-    	listener = new ConcreteKeyListener();
-    	drawSurface.addKeyListener(listener);  // TODO generalize this
-    	inputManager = new InputManager(listener);
-    	initKeyBindings();
-    	
-    	// init state
-    	state = new RunRoundState(); 	
+    	init();	
+    }
+    
+    public void setInputManager(InputManager im)
+    {
+    	this.inputManager = im;
     }
  
+    public void setDrawSurface(DrawSurface ds)
+    {
+    	this.drawSurface = ds;
+    }
+    
     /**
      * Get a list of players in the game.
      * 
@@ -69,75 +59,7 @@ public class TrainGame
     {
     	return players;
     }
-    
-    /**
-     * Initialize all key bindings for the game.
-     */
-    private void initKeyBindings()
-    {
-    	try {
-    		
-    		// bind player keys
-    		if (KEYBOARD_LAYOUT == Layout.QWERTY)
-    		{
-    			bindPlayerKeys(0, KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D);
-    		}
-    		if (KEYBOARD_LAYOUT == Layout.DVORAK)
-    		{
-    			bindPlayerKeys(0, KeyEvent.VK_COMMA, KeyEvent.VK_O, KeyEvent.VK_A, KeyEvent.VK_E);
-    		}
-    		bindPlayerKeys(1, KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT);
-			
-    		// bind general keys
-			Method setOver = TrainGame.class.getMethod("setOver", Boolean.class);
-			Object[] trueObj = {new Boolean(true)};
-			inputManager.register(KeyEvent.VK_ESCAPE, new Action(this, setOver, trueObj));
-			
-			Method reset = TrainGame.class.getMethod("init");
-			inputManager.register(KeyEvent.VK_ENTER, new Action(this, reset, new Object [0]));
-			
-		} catch (NoSuchMethodException e) {
-			System.err.println("Error: Key binding failure");
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			System.err.println("Error: Key binding failure");
-			e.printStackTrace();
-		}
-    	
-    }
-
-    /**
-     * Initialize key bindings for a particular player. Intended for use with <code>KeyEvent</code> constants.
-     * 
-     * @param player Player number of the player to bind keys for
-     * @param up Key to bind to the up action
-     * @param down Key to bind to the down action
-     * @param left Key to bind to the left action
-     * @param right Key to bind to the right action
-     */
-    private void bindPlayerKeys(int player, int up, int down, int left, int right)
-    {
-    	try {
-			Method setHeading = Player.class.getMethod("setDirection", Vector2D.class);
-			Object[] upObj = {VectorDirection.UP};
-			Object[] rightObj = {VectorDirection.RIGHT};
-			Object[] downObj = {VectorDirection.DOWN};
-			Object[] leftObj = {VectorDirection.LEFT};
-			
-			inputManager.register(up, new Action(players.get(player), setHeading, upObj));
-			inputManager.register(left, new Action(players.get(player), setHeading, leftObj));
-			inputManager.register(down, new Action(players.get(player), setHeading, downObj));
-			inputManager.register(right, new Action(players.get(player), setHeading, rightObj));
-			
-		} catch (NoSuchMethodException e) {
-			System.err.println("Error: Player (" + player + ") Key binding failure");
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			System.err.println("Error: Player (" + player + ") Key binding failure");
-			e.printStackTrace();
-		}
-    }
-    
+        
     /**
      * Setter for isOver.
      * 
@@ -154,8 +76,8 @@ public class TrainGame
     public void init()
     {
     	Vector2D[] positions = {
-    			new Vector2D(.8f, (float) (.4 / PIXELS_PER_UNIT * HEIGHT)),
-    			new Vector2D(.8f, (float) (.6 / PIXELS_PER_UNIT * HEIGHT)) };
+    			new Vector2D(.8f, (float) (.4 / PCDriver.PIXELS_PER_UNIT * PCDriver.HEIGHT)),
+    			new Vector2D(.8f, (float) (.6 / PCDriver.PIXELS_PER_UNIT * PCDriver.HEIGHT)) };
     	Vector2D[] directions = {
     			VectorDirection.RIGHT,
     			VectorDirection.RIGHT };
@@ -189,7 +111,7 @@ public class TrainGame
     /**
      * Run a round of the game.
      */
-    private void run()
+    public void run()
     {
     	long oldTime;
     	long elapsed = 0;
@@ -234,18 +156,6 @@ public class TrainGame
     public boolean inBounds (Rectangle rect)
     {
     	return BOUNDARY.contains(rect);
-    }
-
-    /**
-     * Main method to run the game.
-     * 
-     * @param args
-     */
-    public static void main (String [] args)
-    {
-    		TrainGame game = new TrainGame();
-    		game.init();
-    		game.run ();
     }
     
     interface GameState

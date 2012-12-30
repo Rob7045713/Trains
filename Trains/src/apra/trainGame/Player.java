@@ -1,10 +1,9 @@
 package apra.trainGame;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.awt.Color;
-import java.awt.Graphics;
 
 import apra.trainGame.pc.DrawSurface;
+import apra.trainGame.pc.PCDriver;
 
 public class Player
 {
@@ -290,7 +289,7 @@ public class Player
      */
     public Rectangle getEndBox(End end)
     {
-    	int ppu = TrainGame.PIXELS_PER_UNIT;
+    	int ppu = PCDriver.PIXELS_PER_UNIT;
 		int width = (int) (ACCEL_WIDTH * ppu);
 		int x = 0;
 		int y = 0;
@@ -457,7 +456,7 @@ public class Player
     		Vector2D topLeft = pos.add(bigOffset).add(smallOffset);
     		
     		// TODO reconsider this
-    		int ppu = TrainGame.PIXELS_PER_UNIT;
+    		int ppu = PCDriver.PIXELS_PER_UNIT;
     		
     		Rectangle r = new Rectangle((int) (ppu * topLeft.x), (int) (ppu * topLeft.y),
     				(int) (ppu * width), (int) (ppu * height));

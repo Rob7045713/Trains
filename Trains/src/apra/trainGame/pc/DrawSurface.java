@@ -9,6 +9,11 @@ import apra.trainGame.TrainGame;
 
 
 public class DrawSurface extends Canvas {
+	/**
+	 * Just to get rid of a warning, not used at the moment
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	public static final int MAX_ALPHA = 0xff000000;
 	public static final int BLACK = Color.BLACK.getRGB() + MAX_ALPHA;
 	public static final int RED = Color.RED.getRGB() + MAX_ALPHA;
@@ -46,7 +51,7 @@ public class DrawSurface extends Canvas {
 	// TODO move this?
 	public void addKeyListener (ConcreteKeyListener listener)
     {
-    	frame.addKeyListener (listener);
+    	frame.addKeyListener(listener);
     }
 
     public void paint(TrainGame game)
