@@ -38,7 +38,7 @@ public class Player
     private float headAcceleration;
     private float tailAcceleration;
     private boolean isDead;
-    private Color color;
+    private int color;
     private boolean canTurn; // XXX this is a quick-fix, consider changing
     
     /**
@@ -46,7 +46,7 @@ public class Player
      * 
      * @param color <code>Color</code> to use
      */
-    public Player(Color color)
+    public Player(int color)
     {
     	this(new Vector2D(0,0), VectorDirection.RIGHT, 0.0f, color);
     }
@@ -59,7 +59,7 @@ public class Player
      * @param length length to use
      * @param color <code>Color</code> to use
      */
-    public Player(Vector2D position, Vector2D direction, float length, Color color)
+    public Player(Vector2D position, Vector2D direction, float length, int color)
     {
     	this.headPosition = position;
     	this.direction = direction.copy();
@@ -82,7 +82,7 @@ public class Player
      * 
      * @return <code>Color</code> of the train
      */
-    public Color getColor()
+    public int getColor()
     {
     	return color;
     }
@@ -90,31 +90,31 @@ public class Player
     /**
      * Draw the player to a <code>Graphics</code>.
      * 
-     * @param g <code>Graphics</code> to draw to
+     * @param ds <code>Graphics</code> to draw to
      */
-    public void draw(Graphics g)
+    public void draw(DrawSurface ds)
     {
     	// draw the physical train
     	for (Rectangle r : getRectangles())
     	{
-    		g.setColor(color);
-    		g.fillRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
+    		ds.setColor(color);
+    		ds.fillRect(r);
     	}
 
     	// draw the head acceleration box
     	if (DRAW_HEAD_BOX)
 	    {
-    		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 64));
+    		ds.setColor(color - 255 + 64);
     		Rectangle r = getEndBox(End.HEAD);
-    		g.fillRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
+    		ds.fillRect(r);
 	    }
 	
     	// draw the tail acceleration box
     	if (DRAW_TAIL_BOX)
 	    {
-    		g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 32));
+    		ds.setColor(color - 255 + 32);
     		Rectangle r = getEndBox(End.TAIL);
-    		g.fillRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
+    		ds.fillRect(r);
 	    }
     }
 

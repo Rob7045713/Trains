@@ -18,11 +18,11 @@ public class TrainGame
     private static final int WALL_WIDTH = WIDTH/500;
     private static final long MAX_FRAMERATE = 60;
     private static final int NUM_PLAYERS = 2;
-    private static final Color[] playerColors = {Color.RED, Color.BLUE, Color.GREEN, Color.RED};
+    private static final int[] playerColors = {DrawSurface.RED, DrawSurface.BLUE, DrawSurface.GREEN, DrawSurface.RED};
     private enum Layout {QWERTY, DVORAK}
     private static final Layout KEYBOARD_LAYOUT = Layout.QWERTY;
     
-    private CanvasHolder canvasHolder;
+    private DrawSurface drawSurface;
     private ArrayList<Player> players;
     private InputManager inputManager;
     private ConcreteKeyListener listener;
@@ -36,18 +36,18 @@ public class TrainGame
     public TrainGame()
     {
     	// init canvas holder
-    	canvasHolder = new CanvasHolder(WIDTH, HEIGHT);
+    	drawSurface = new DrawSurface(WIDTH, HEIGHT, DrawSurface.WHITE);
     	
     	// init player list
     	players = new ArrayList<Player>();
     	for(int i = 0; i < NUM_PLAYERS; i++)
     	{
-	    players.add(new Player(playerColors[i]));
+    		players.add(new Player(playerColors[i]));
     	}
     	
     	// init input manager
-    	listener = new ConcreteKeyListener ();
-    	canvasHolder.addKeyListener(listener);
+    	listener = new ConcreteKeyListener();
+    	drawSurface.addKeyListener(listener);  // TODO generalize this
     	inputManager = new InputManager(listener);
     	initKeyBindings();
     	
@@ -176,18 +176,9 @@ public class TrainGame
     	state.update(this, elapsed);
     }
     
-    /**
-     * Draw the game to the screen.
-     */
-    private void draw()
+    public void draw(DrawSurface ds)
     {
-    	canvasHolder.clear();
-    	canvasHolder.paint2(this);
-    }
-    
-    public void draw(Graphics g)
-    {
-    	state.draw(this, g);
+    	state.draw(this, ds);
     }
     
     /**
@@ -199,14 +190,12 @@ public class TrainGame
     	long elapsed = 0;
       	long frameTime = 1000 / MAX_FRAMERATE;
 	
-    	//System.out.println ("Press esc to exit...");
-	
     	while (!isQuit)
     	{
     		// update / draw
     		oldTime = System.currentTimeMillis();
     		update(elapsed);
-    		draw();
+    		drawSurface.paint(this);
     		elapsed = System.currentTimeMillis()-oldTime;
 
     		// framerate limiter
@@ -223,7 +212,8 @@ public class TrainGame
     		
     			elapsed = System.currentTimeMillis() - oldTime;
     		}
-		System.out.println (1000/elapsed);
+    	
+    		//System.out.println (1000/elapsed);
     		
     	}
 	
@@ -256,7 +246,7 @@ public class TrainGame
     interface GameState
     {
     	public void update(TrainGame game, long elapsed);
-    	public void draw(TrainGame game, Graphics g);
+    	public void draw(TrainGame game, DrawSurface ds);
     }
     
     class RunRoundState implements GameState
@@ -287,10 +277,10 @@ public class TrainGame
 		}
 
 		@Override
-		public void draw(TrainGame game, Graphics g) {
+		public void draw(TrainGame game, DrawSurface ds) {
 			for (Player player : game.getPlayers())
 			{
-				player.draw(g);
+				player.draw(ds);
 			}
 		}
     	
@@ -306,8 +296,8 @@ public class TrainGame
 		}
 
 		@Override
-		public void draw(TrainGame game, Graphics g) {
-			Color winner = Color.BLACK;
+		public void draw(TrainGame game, DrawSurface ds) {
+			int winner = DrawSurface.BLACK;
 			
 			for (Player player : players)
 			{
@@ -315,12 +305,12 @@ public class TrainGame
 					winner = player.getColor();
 			}
 			
-			g.setColor(new Color(winner.getRed(), winner.getGreen(), winner.getBlue(), 64));
-			g.fillRect(BOUNDARY.getX(), BOUNDARY.getY(), BOUNDARY.getWidth(), BOUNDARY.getHeight());
+			ds.setColor(winner - 255 + 64);
+			ds.fillRect(BOUNDARY);
 			
 			for (Player player : game.getPlayers())
 			{
-				player.draw(g);
+				player.draw(ds);
 			}
 		}
     	
