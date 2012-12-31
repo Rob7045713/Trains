@@ -69,10 +69,11 @@ public class GameController {
 	
 	public void doAction(GameAction action)
 	{
-		doAction(GameController.GameAction.PLAYER_1_CCW);
+		actionMap.get(action).Execute();
 	}
 	
 	public void doClick(int x, int y)
 	{
+		// TODO link this up with in game buttons
 	}
 }

@@ -19,8 +19,7 @@ public class PCDriver {
     		PCInputManager im = new PCInputManager();
         	PCDrawSurface ds = new PCDrawSurface(WIDTH, HEIGHT, Color.WHITE);
         	
-        	ds.addKeyListener(im.getListener()); 
-        	im.initKeyBindings(game);
+        	ds.addKeyListener(im.getListener());
         	game.setInputManager(im);
         	game.setDrawSurface(ds);
     		

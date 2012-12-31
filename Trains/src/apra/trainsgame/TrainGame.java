@@ -21,6 +21,7 @@ public class TrainGame
     private boolean isQuit;
     private static Rectangle BOUNDARY = new Rectangle(0, 0, PCDriver.WIDTH, PCDriver.HEIGHT);
     private GameState state; 
+    private GameController gameController;
     
     /**
      * Constructor for Trains. Initializes canvas, player list, and input management.
@@ -35,6 +36,8 @@ public class TrainGame
     	}
     	
     	init();	
+    	
+    	this.gameController = new GameController(this);
     }
     
     public void setInputManager(InputManager im)
@@ -45,6 +48,11 @@ public class TrainGame
     public void setDrawSurface(DrawSurface ds)
     {
     	this.drawSurface = ds;
+    }
+ 
+    public GameController getGameController()
+    {
+    	return gameController;
     }
     
     /**
