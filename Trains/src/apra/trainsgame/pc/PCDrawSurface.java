@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 
 import apra.trainsgame.DrawSurface;
 import apra.trainsgame.Rectangle;
-import apra.trainsgame.TrainGame;
+import apra.trainsgame.TrainsGame;
 
 
 public class PCDrawSurface extends Canvas implements DrawSurface {
@@ -46,7 +46,7 @@ public class PCDrawSurface extends Canvas implements DrawSurface {
     	frame.addKeyListener(listener);
     }
 
-    public void paint(TrainGame game)
+    public void paint(TrainsGame game)
     {	
     	Graphics g = this.getBufferStrategy().getDrawGraphics ();
     	this.g = g;

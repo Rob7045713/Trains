@@ -11,13 +11,13 @@ public class GameController {
 		}
 	private HashMap<GameAction, Action> actionMap;
 	
-	public GameController(TrainGame game) 
+	public GameController(TrainsGame game) 
 	{
 		actionMap = new HashMap<GameAction, Action>();
 		initMap(game);
 	}
 	
-	private void initMap(TrainGame game)
+	private void initMap(TrainsGame game)
 	{
 		try {
     		
@@ -28,11 +28,11 @@ public class GameController {
 					GameAction.PLAYER_2_UP, GameAction.PLAYER_2_DOWN, GameAction.PLAYER_2_LEFT, GameAction.PLAYER_2_RIGHT);
 			
     		// bind general keys
-			Method setOver = TrainGame.class.getMethod("setOver", Boolean.class);
+			Method setOver = TrainsGame.class.getMethod("setOver", Boolean.class);
 			Object[] trueObj = {new Boolean(true)};
 			actionMap.put(GameAction.GAME_END, new Action(game, setOver, trueObj));
 			
-			Method reset = TrainGame.class.getMethod("init");
+			Method reset = TrainsGame.class.getMethod("init");
 			actionMap.put(GameAction.GAME_RESTART, new Action(game, reset, new Object [0]));
 			
 		} catch (NoSuchMethodException e) {

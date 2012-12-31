@@ -8,7 +8,7 @@ import apra.trainsgame.Action;
 import apra.trainsgame.GameController.GameAction;
 import apra.trainsgame.InputManager;
 import apra.trainsgame.Player;
-import apra.trainsgame.TrainGame;
+import apra.trainsgame.TrainsGame;
 import apra.trainsgame.Vector2D;
 import apra.trainsgame.VectorDirection;
 
@@ -73,7 +73,7 @@ public class PCInputManager implements InputManager {
 	/**
 	 * Respond to all input.
 	 */
-	public void doInput(TrainGame game)
+	public void doInput(TrainsGame game)
 	{
 		Iterator<KeyEvent> iterator = listener.getKeyEventsIterator();
 		while (iterator.hasNext())

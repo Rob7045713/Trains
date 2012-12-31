@@ -1,7 +1,7 @@
 package apra.trainsgame.pc;
 
 import apra.trainsgame.Color;
-import apra.trainsgame.TrainGame;
+import apra.trainsgame.TrainsGame;
 
 public class PCDriver {
 	public static final int WIDTH = 1020;
@@ -15,7 +15,7 @@ public class PCDriver {
      */
     public static void main (String [] args)
     {
-    		TrainGame game = new TrainGame();
+    		TrainsGame game = new TrainsGame();
     		PCInputManager im = new PCInputManager();
         	PCDrawSurface ds = new PCDrawSurface(WIDTH, HEIGHT, Color.WHITE);
         	

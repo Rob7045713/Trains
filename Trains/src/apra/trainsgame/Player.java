@@ -196,7 +196,7 @@ public class Player
      * @param elapsed time in milliseconds since the last update
      * @param game reference to <code>TrainGame</code> the player belongs to
      */
-    public void update(long elapsed, TrainGame game)
+    public void update(long elapsed, TrainsGame game)
     {
     	updateAccelerations(game);
     	updatePositions(elapsed);
@@ -312,7 +312,7 @@ public class Player
      * 
      * @param game reference to <code>TrainGame</code> the player belongs to
      */
-    private void updateAccelerations(TrainGame game)
+    private void updateAccelerations(TrainsGame game)
     {
     	// TODO combine these into a method somehow
     	

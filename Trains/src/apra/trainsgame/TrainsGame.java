@@ -9,7 +9,7 @@ import apra.trainsgame.pc.PCDriver;
  * @author Austin Purves
  * @author Rob Argue
  */
-public class TrainGame
+public class TrainsGame
 {
     private static final long MAX_FRAMERATE = 60;
     private static final int NUM_PLAYERS = 2;
@@ -26,7 +26,7 @@ public class TrainGame
     /**
      * Constructor for Trains. Initializes canvas, player list, and input management.
      */
-    public TrainGame()
+    public TrainsGame()
     {
     	// init player list
     	players = new ArrayList<Player>();
@@ -165,15 +165,15 @@ public class TrainGame
     
     interface GameState
     {
-    	public void update(TrainGame game, long elapsed);
-    	public void draw(TrainGame game, DrawSurface ds);
+    	public void update(TrainsGame game, long elapsed);
+    	public void draw(TrainsGame game, DrawSurface ds);
     }
     
     class RunRoundState implements GameState
     {
 
 		@Override
-		public void update(TrainGame game, long elapsed) {
+		public void update(TrainsGame game, long elapsed) {
 			
 			// respond to input
 			inputManager.doInput(game);
@@ -197,7 +197,7 @@ public class TrainGame
 		}
 
 		@Override
-		public void draw(TrainGame game, DrawSurface ds) {
+		public void draw(TrainsGame game, DrawSurface ds) {
 			for (Player player : game.getPlayers())
 			{
 				player.draw(ds);
@@ -210,13 +210,13 @@ public class TrainGame
     {
 
 		@Override
-		public void update(TrainGame game, long elapsed) {
+		public void update(TrainsGame game, long elapsed) {
 			// respond to input
 			inputManager.doInput(game);
 		}
 
 		@Override
-		public void draw(TrainGame game, DrawSurface ds) {
+		public void draw(TrainsGame game, DrawSurface ds) {
 			Color winner = Color.BLACK;
 			
 			for (Player player : players)
