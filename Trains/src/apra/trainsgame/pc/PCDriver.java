@@ -4,9 +4,8 @@ import apra.trainsgame.Color;
 import apra.trainsgame.TrainsGame;
 
 public class PCDriver {
-	public static final int WIDTH = 1020;
-	public static final int PIXELS_PER_UNIT = WIDTH;
-	public static final int HEIGHT = 720;
+	private static final int WIDTH = 1020;
+	private static final int HEIGHT = 720;
 	
 	/**
      * Main method to run the game.
@@ -15,7 +14,7 @@ public class PCDriver {
      */
     public static void main (String [] args)
     {
-    		TrainsGame game = new TrainsGame();
+    		TrainsGame game = new TrainsGame(WIDTH, HEIGHT);
     		PCInputManager im = new PCInputManager();
         	PCDrawSurface ds = new PCDrawSurface(WIDTH, HEIGHT, Color.WHITE);
         	

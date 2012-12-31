@@ -11,6 +11,8 @@ import apra.trainsgame.pc.PCDriver;
  */
 public class TrainsGame
 {
+	public static int pixelsPerUnit;
+
     private static final long MAX_FRAMERATE = 60;
     private static final int NUM_PLAYERS = 2;
     private static final Color[] playerColors = {Color.RED, Color.BLUE, Color.GREEN, Color.RED};
@@ -19,15 +21,17 @@ public class TrainsGame
     private ArrayList<Player> players;
     private InputManager inputManager;
     private boolean isQuit;
-    private static Rectangle BOUNDARY = new Rectangle(0, 0, PCDriver.WIDTH, PCDriver.HEIGHT);
+    private static Rectangle boundary;
     private GameState state; 
     private GameController gameController;
     
     /**
      * Constructor for Trains. Initializes canvas, player list, and input management.
      */
-    public TrainsGame()
+    public TrainsGame(int width, int height)
     {
+    	boundary = new Rectangle(0, 0, width, height);
+    	pixelsPerUnit = width;
     	// init player list
     	players = new ArrayList<Player>();
     	for(int i = 0; i < NUM_PLAYERS; i++)
@@ -81,8 +85,8 @@ public class TrainsGame
     public void init()
     {
     	Vector2D[] positions = {
-    			new Vector2D(.8f, (float) (.4 / PCDriver.PIXELS_PER_UNIT * PCDriver.HEIGHT)),
-    			new Vector2D(.8f, (float) (.6 / PCDriver.PIXELS_PER_UNIT * PCDriver.HEIGHT)) };
+    			new Vector2D(.8f, (float) (.4 / pixelsPerUnit * boundary.getHeight())),
+    			new Vector2D(.8f, (float) (.6 / pixelsPerUnit * boundary.getHeight())) };
     	Vector2D[] directions = {
     			VectorDirection.RIGHT,
     			VectorDirection.RIGHT };
@@ -160,7 +164,7 @@ public class TrainsGame
      */
     public boolean inBounds (Rectangle rect)
     {
-    	return BOUNDARY.contains(rect);
+    	return boundary.contains(rect);
     }
     
     interface GameState
@@ -226,7 +230,7 @@ public class TrainsGame
 			}
 			
 			ds.setColor(new Color(32, winner.getRed(), winner.getGreen(), winner.getBlue()));
-			ds.fillRect(BOUNDARY);
+			ds.fillRect(boundary);
 			
 			for (Player player : game.getPlayers())
 			{

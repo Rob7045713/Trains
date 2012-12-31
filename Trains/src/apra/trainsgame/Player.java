@@ -2,8 +2,6 @@ package apra.trainsgame;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-import apra.trainsgame.pc.PCDriver;
-
 public class Player
 {
 	/*
@@ -287,7 +285,7 @@ public class Player
      */
     public Rectangle getEndBox(End end)
     {
-    	int ppu = PCDriver.PIXELS_PER_UNIT;
+    	int ppu = TrainsGame.pixelsPerUnit;
 		int width = (int) (ACCEL_WIDTH * ppu);
 		int x = 0;
 		int y = 0;
@@ -454,7 +452,7 @@ public class Player
     		Vector2D topLeft = pos.add(bigOffset).add(smallOffset);
     		
     		// TODO reconsider this
-    		int ppu = PCDriver.PIXELS_PER_UNIT;
+    		int ppu = TrainsGame.pixelsPerUnit;
     		
     		Rectangle r = new Rectangle((int) (ppu * topLeft.x), (int) (ppu * topLeft.y),
     				(int) (ppu * width), (int) (ppu * height));
