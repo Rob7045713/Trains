@@ -9,7 +9,7 @@ import apra.trainsgame.pc.PCDriver;
  * @author Austin Purves
  * @author Rob Argue
  */
-public class TrainsGame
+public class TrainsGame extends Thread
 {
 	public static int pixelsPerUnit;
 
@@ -28,8 +28,12 @@ public class TrainsGame
     /**
      * Constructor for Trains. Initializes canvas, player list, and input management.
      */
-    public TrainsGame(int width, int height)
+    public TrainsGame(int width, int height, InputManager im, DrawSurface ds)
     {
+    	this.inputManager = im;
+    	this.drawSurface = ds;
+    	this.isQuit = false;
+    	
     	boundary = new Rectangle(0, 0, width, height);
     	pixelsPerUnit = width;
     	// init player list
@@ -70,13 +74,13 @@ public class TrainsGame
     }
         
     /**
-     * Setter for isOver.
+     * Setter for isQuit.
      * 
-     * @param over New value to use for isOver
+     * @param over New value to use for isQuit
      */
-    public void setOver(Boolean over)
+    public void setQuit(Boolean quit)
     {
-    	this.isQuit = over;
+    	this.isQuit = quit;
     }
     
     /**
@@ -107,7 +111,7 @@ public class TrainsGame
      * 
      * @param elapsed Time elapsed (in milliseconds) since the last update
      */
-    private void update(long elapsed) 
+    public void update(long elapsed) 
     {
     	state.update(this, elapsed);
     }
@@ -152,8 +156,6 @@ public class TrainsGame
     		//System.out.println (1000/elapsed);
     		
     	}
-	
-    	//System.out.println ("done.");
     }
 
     /**

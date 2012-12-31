@@ -9,7 +9,7 @@ public class Player
 	 */
     public static final float MIN_SPEED 			= .0025f / 16.0f;
     public static final float ACCEL 				= .00001f / (16.0f * 16.0f);
-    public static final float COLLISION_WIDTH 		= .002f;
+    public static final float COLLISION_WIDTH 		= .005f;
     public static final float ACCEL_WIDTH 			= .08f;
     public static final float DECEL_MODIFIER 		= 1.0f;
     public static final float SELF_ACCEL_MODIFIER 	= -1.0f; // -1.0f is default behavior

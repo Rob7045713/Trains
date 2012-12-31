@@ -28,7 +28,7 @@ public class GameController {
 					GameAction.PLAYER_2_UP, GameAction.PLAYER_2_DOWN, GameAction.PLAYER_2_LEFT, GameAction.PLAYER_2_RIGHT);
 			
     		// bind general keys
-			Method setOver = TrainsGame.class.getMethod("setOver", Boolean.class);
+			Method setOver = TrainsGame.class.getMethod("setQuit", Boolean.class);
 			Object[] trueObj = {new Boolean(true)};
 			actionMap.put(GameAction.GAME_END, new Action(game, setOver, trueObj));
 			
