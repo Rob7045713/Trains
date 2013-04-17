@@ -62,6 +62,7 @@ public class PCDrawSurface extends Canvas implements DrawSurface {
 	{
 		g.setColor(backgroundColor);
 		g.clearRect(0, 0, width, height);
+		g.fillRect(0, 0, width, height);
 	}
 	
 	public void setColor(apra.trainsgame.Color color)

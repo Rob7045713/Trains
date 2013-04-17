@@ -55,13 +55,18 @@ public class TrainsGame extends Thread
 	buttonManager.addButton (new Rectangle (0,(height-width)/2,width,width), GameAction.GAME_RESTART);
 	/*buttonManager.addButton (new Rectangle (0,0,width/2,(height-width)/2), GameAction.PLAYER_1_CW);
 	buttonManager.addButton (new Rectangle (width/2,0,width/2,(height-width)/2), GameAction.PLAYER_1_CCW);*/
-	buttonManager.addButton (new Rectangle (0,height-(height-width)/2,width/2,(height-width)/2), GameAction.PLAYER_2_CCW);
-	buttonManager.addButton (new Rectangle (width/2,height-(height-width)/2,width/2,(height-width)/2), GameAction.PLAYER_2_CW);
+	/*buttonManager.addButton (new Rectangle (0,height-(height-width)/2,width/2,(height-width)/2), GameAction.PLAYER_2_CCW);
+	  buttonManager.addButton (new Rectangle (width/2,height-(height-width)/2,width/2,(height-width)/2), GameAction.PLAYER_2_CW);*/
 
 	buttonManager.addButton (new Rectangle (0,0,(height-width)/3,(height-width)/2), GameAction.PLAYER_1_LEFT);
 	buttonManager.addButton (new Rectangle (width-(height-width)/3,0,(height-width)/3,(height-width)/2), GameAction.PLAYER_1_RIGHT);
 	buttonManager.addButton (new Rectangle ((height-width)/3,0,width-(height-width)*2/3,(height-width)/4), GameAction.PLAYER_1_UP);
 	buttonManager.addButton (new Rectangle ((height-width)/3,(height-width)/4,width-(height-width)*2/3,(height-width)/4), GameAction.PLAYER_1_DOWN);
+
+	buttonManager.addButton (new Rectangle (0,height-(height-width)/2,(height-width)/3,(height-width)/2), GameAction.PLAYER_2_LEFT);
+	buttonManager.addButton (new Rectangle (width-(height-width)/3,height-(height-width)/2,(height-width)/3,(height-width)/2), GameAction.PLAYER_2_RIGHT);
+	buttonManager.addButton (new Rectangle ((height-width)/3,height-(height-width)/2,width-(height-width)*2/3,(height-width)/4), GameAction.PLAYER_2_UP);
+	buttonManager.addButton (new Rectangle ((height-width)/3,height-(height-width)/4,width-(height-width)*2/3,(height-width)/4), GameAction.PLAYER_2_DOWN);
 
     	init();	
     	
@@ -249,10 +254,18 @@ public class TrainsGame extends Thread
 			ds.setColor (new Color (100,255,0,0));
 			ds.fillRect (new Rectangle ((height-width)/3,(height-width)/4,width-(height-width)*2/3,(height-width)/4));
 
+			ds.setColor (new Color (75,0,0,255));
+			ds.fillRect (new Rectangle (0,height-(height-width)/2,(height-width)/3,(height-width)/2));
+			ds.fillRect (new Rectangle (width-(height-width)/3,height-(height-width)/2,(height-width)/3,(height-width)/2));
 			ds.setColor (new Color (100,0,0,255));
+			ds.fillRect (new Rectangle ((height-width)/3,height-(height-width)/2,width-(height-width)*2/3,(height-width)/4));
+			ds.setColor (new Color (50,0,0,255));
+			ds.fillRect (new Rectangle ((height-width)/3,height-(height-width)/4,width-(height-width)*2/3,(height-width)/4));
+
+			/*ds.setColor (new Color (100,0,0,255));
 			ds.fillRect (new Rectangle (0,height-(height-width)/2,width/2,(height-width)/2));
 			ds.setColor (new Color (50,0,0,255));
-			ds.fillRect (new Rectangle (width/2,height-(height-width)/2,width/2,(height-width)/2));
+			ds.fillRect (new Rectangle (width/2,height-(height-width)/2,width/2,(height-width)/2));*/
 		}
     	
     }
