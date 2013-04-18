@@ -18,7 +18,7 @@ public class PCDriver {
     {
     		
     		PCInputManager im = new PCInputManager();
-        	PCDrawSurface ds = new PCDrawSurface(WIDTH, HEIGHT, Color.BLACK);
+        	PCDrawSurface ds = new PCDrawSurface(WIDTH, HEIGHT, Color.WHITE);
         	TrainsGame game = new TrainsGame(WIDTH, HEIGHT, im, ds);
         	
         	ds.addKeyListener(im.getListener());

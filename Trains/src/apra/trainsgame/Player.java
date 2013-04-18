@@ -9,7 +9,7 @@ public class Player
 	 */
     public static final float MIN_SPEED 			= .0025f / 16.0f;
     public static final float ACCEL 				= .00001f / (16.0f * 16.0f);
-    public static final float COLLISION_WIDTH 		= .01f;
+    public static final float COLLISION_WIDTH 		= .015f;
     public static final float ACCEL_WIDTH 			= .12f;
     public static final float DECEL_MODIFIER 		= 1.0f;
     public static final float SELF_ACCEL_MODIFIER 	= -1.0f; // -1.0f is default behavior
@@ -103,7 +103,7 @@ public class Player
     	// draw the head acceleration box
     	if (DRAW_HEAD_BOX)
 	    {
-    		ds.setColor(new Color(64, color.getRed(), color.getGreen(), color.getBlue()));
+    		ds.setColor(new Color(40, color.getRed(), color.getGreen(), color.getBlue()));
     		Rectangle r = getEndBox(End.HEAD);
     		ds.fillRect(r);
 	    }
